@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2026 端午达达线-热阿线休闲攻略</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1f2933;
+      --muted: #5f6f7a;
+      --paper: #f7f4ed;
+      --panel: #ffffff;
+      --line: #d8d0c2;
+      --grass: #436b4f;
+      --lake: #286c7c;
+      --sun: #b85c38;
+      --stone: #73706a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.62;
+    }
+    a { color: var(--lake); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .hero {
+      min-height: 78vh;
+      display: grid;
+      align-items: end;
+      background:
+        linear-gradient(180deg, rgba(21, 38, 34, .08), rgba(21, 38, 34, .68)),
+        url("https://commons.wikimedia.org/wiki/Special:FilePath/%E8%B4%A1%E6%A0%BC%E5%B0%94%E8%8D%89%E5%8E%9F_-_Gongger_Grasslands_-_2011.06_-_panoramio.jpg?width=1800") center/cover;
+      color: #fff;
+      padding: 42px 22px;
+    }
+    .hero-inner, main { width: min(1120px, calc(100% - 36px)); margin: 0 auto; }
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 10px;
+      border: 1px solid rgba(255,255,255,.55);
+      background: rgba(0,0,0,.18);
+      font-size: 13px;
+    }
+    h1 {
+      max-width: 840px;
+      margin: 18px 0 12px;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: 1.02;
+      font-weight: 780;
+    }
+    .hero p { max-width: 760px; margin: 0; font-size: clamp(17px, 2.2vw, 22px); color: rgba(255,255,255,.92); }
+    main { padding: 28px 0 54px; }
+    section { margin: 34px 0; }
+    h2 { margin: 0 0 14px; font-size: 26px; line-height: 1.2; }
+    h3 { margin: 0 0 8px; font-size: 18px; }
+    .grid { display: grid; gap: 16px; }
+    .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 1px 0 rgba(31,41,51,.04);
+    }
+    .lead { font-size: 18px; color: #34444d; }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      margin: 0 8px 8px 0;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #e7efe9;
+      color: #284936;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .tag.alt { background: #e7f0f3; color: #1e5160; }
+    .tag.warn { background: #f5e8dc; color: #7b3d24; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 8px 13px;
+      border: 1px solid var(--lake);
+      border-radius: 7px;
+      background: var(--lake);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .button.secondary {
+      background: #fff;
+      color: var(--lake);
+    }
+    .button:hover { text-decoration: none; filter: brightness(.98); }
+    .recommend {
+      border-left: 5px solid var(--grass);
+      background: #fbfcf8;
+    }
+    .timeline { display: grid; gap: 14px; }
+    .day {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .date {
+      position: sticky;
+      top: 12px;
+      color: #fff;
+      background: var(--grass);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .timeblock {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid #e8e0d2;
+    }
+    .timeblock:first-child { border-top: 0; padding-top: 0; }
+    .time { color: var(--sun); font-weight: 700; }
+    .photo-grid {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 14px;
+    }
+    figure { margin: 0; }
+    figure img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 220px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #e9e2d8;
+    }
+    figcaption { margin-top: 6px; color: var(--muted); font-size: 12px; }
+    .metric {
+      display: grid;
+      gap: 4px;
+      padding: 14px;
+      background: #f4f7f6;
+      border-radius: 8px;
+      min-height: 96px;
+    }
+    .metric b { font-size: 22px; color: var(--lake); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e6ded1;
+      vertical-align: top;
+      text-align: left;
+    }
+    th { background: #edf2ee; color: #2d4536; }
+    tr:last-child td { border-bottom: 0; }
+    ul { padding-left: 20px; margin: 8px 0 0; }
+    li { margin: 5px 0; }
+    .note {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .route {
+      display: grid;
+      gap: 10px;
+    }
+    .route-step {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      min-height: 44px;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--sun);
+      flex: 0 0 auto;
+    }
+    .line-dot { background: var(--lake); }
+    footer {
+      background: #273036;
+      color: #dce4e2;
+      padding: 28px 0;
+    }
+    footer .hero-inner { display: grid; gap: 8px; }
+    footer a { color: #bfe8f1; }
+    @media (max-width: 820px) {
+      .cols-3, .cols-2, .photo-grid { grid-template-columns: 1fr; }
+      .day { grid-template-columns: 1fr; }
+      .date { position: static; text-align: left; }
+      .timeblock { grid-template-columns: 78px 1fr; }
+      table { font-size: 14px; }
+      th, td { padding: 10px; }
+    }
+    @media print {
+      .hero { min-height: auto; color: var(--ink); background: none; padding: 20px 0; }
+      .hero p, .eyebrow { color: var(--ink); background: none; border-color: var(--line); }
+      figure img { max-height: 220px; }
+      a { color: var(--ink); text-decoration: underline; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">2026/06/19 - 2026/06/21 · 北京出发 · 2人休闲自驾</span>
+      <h1>达达线 - 热阿线端午小环线</h1>
+      <p>把重点放在草原公路、黄岗梁森林、阿斯哈图石林和达里湖日落，不追求打卡数量，优先少赶路、少人流、留机动。</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="card recommend">
+      <h2>结论先放这里</h2>
+      <p class="lead"><strong>推荐交通：</strong>北京朝阳高铁到赤峰，赤峰站取还 SUV 租车，再做达达线-热阿线环游。原因是端午 3 天时间短，纯自驾北京往返克旗约 1300km，最后一天会很疲惫；高铁约 2.5 小时到赤峰，可以把体力留给草原路和山路。</p>
+      <div>
+        <span class="tag">首选：6月18日晚到赤峰住一晚</span>
+        <span class="tag alt">备选：6月19日早 G3661 到赤峰</span>
+        <span class="tag warn">不建议：6月19日北京直奔热水塘再玩山路</span>
+      </div>
+      <p class="note">2026 年 6 月 19 日车票按当前 12306 规则预计还未到正式预售窗口；最终车次、余票、票价以 12306 为准。</p>
+      <div class="actions">
+        <a class="button" href="choices.html">打开酒店/餐厅 Top3 副页</a>
+      </div>
+    </section>
+
+    <section>
+      <h2>行程骨架</h2>
+      <div class="grid cols-3">
+        <div class="metric"><b>3天2晚</b><span>可选 6月18日晚前置到赤峰，舒适度明显提升。</span></div>
+        <div class="metric"><b>420-520km</b><span>赤峰取车后的环线驾驶量，按住宿点选择浮动。</span></div>
+        <div class="metric"><b>15-28℃</b><span>克什克腾 6 月常年参考温差大，早晚要带外套。</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="photo-grid">
+        <figure>
+          <img alt="克什克腾草原公路" src="https://commons.wikimedia.org/wiki/Special:FilePath/%E8%8D%89%E5%8E%9F%E5%85%AC%E8%B7%AF_-_Grassland_Road_-_2011.06_-_panoramio.jpg?width=1400">
+          <figcaption>草原公路是这条线的主角，停车拍照比赶景点更值得。</figcaption>
+        </figure>
+        <figure>
+          <img alt="阿斯哈图石林" src="https://commons.wikimedia.org/wiki/Special:FilePath/%E7%9F%B3%E6%9E%97%E8%BF%B7%E5%AE%AB_-_Granite_Pillars_Labyrinth_-_2011.06_-_panoramio.jpg?width=900">
+          <figcaption>阿斯哈图石林适合作为唯一“大景点”。</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>交通规划</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>方案</th>
+            <th>怎么走</th>
+            <th>优点</th>
+            <th>风险与建议</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>高铁 + 赤峰租 SUV</strong><br>推荐</td>
+            <td>北京朝阳 → 赤峰站，赤峰站/市区租车 → 热水塘/经棚 → 热阿线 → 阿斯哈图 → 达达线 → 达里湖 → 赤峰还车。</td>
+            <td>少开北京到赤峰往返高速；取车点有全国连锁网点；返程更稳。</td>
+            <td>端午租车紧张，提前订可取消 SUV；取车前确认是否允许走非铺装路，轮胎/底盘免责范围要看清。</td>
+          </tr>
+          <tr>
+            <td><strong>北京纯自驾</strong><br>备选</td>
+            <td>北京 → 承德/赤峰 → 经棚/热水塘 → 环线 → 北京。</td>
+            <td>行李灵活，不受租车门店时间限制；如果自家车底盘高更省心。</td>
+            <td>北京到克旗约 653km、8小时级别；6月21日返京会累。更适合 6月18日晚先开到承德或赤峰。</td>
+          </tr>
+          <tr>
+            <td><strong>飞机 + 租车</strong><br>不优先</td>
+            <td>北京 → 赤峰玉龙机场 → 租车。</td>
+            <td>理论上快。</td>
+            <td>机场安检、航班时刻、延误和取车衔接抵消优势；北京到赤峰高铁更直接。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>推荐时间表</h2>
+      <div class="timeline">
+        <div class="day">
+          <div class="date">6/18<br>可选前置</div>
+          <div class="card">
+            <div class="timeblock">
+              <div class="time">18:30后</div>
+              <div><strong>北京朝阳坐晚间高铁到赤峰。</strong>现有时刻参考里，北京朝阳到赤峰晚间有 18:38、19:30、19:50、19:58 等车次区间，约 2.5 小时。</div>
+            </div>
+            <div class="timeblock">
+              <div class="time">22:30前后</div>
+              <div><strong>住赤峰站/市政府片区。</strong>第二天不用早起赶北京出城，也不需要夜里取车。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="date">6/19<br>周五</div>
+          <div class="card">
+            <div class="timeblock">
+              <div class="time">08:30</div>
+              <div><strong>赤峰取车，优先 SUV。</strong>如果 6月19日当天从北京走，优先 G3661 参考时刻 06:35-09:05，到站后取车。</div>
+            </div>
+            <div class="timeblock">
+              <div class="time">09:30</div>
+              <div><strong>赤峰 → 热水塘/经棚。</strong>中途吃简餐，下午先入住，不急着冲完整条线。</div>
+            </div>
+            <div class="timeblock">
+              <div class="time">15:30</div>
+              <div><strong>轻走热阿线南段。</strong>热水塘到黄岗梁方向先试路况，找开阔处看草甸、森林和落日，不安排硬性景点。</div>
+            </div>
+            <div class="timeblock">
+              <div class="time">19:30</div>
+              <div><strong>热水塘温泉 + 蒙餐。</strong>住热水塘更贴合休闲主题；介意老酒店设施则住经棚镇连锁酒店。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="date">6/20<br>周六</div>
+          <div class="card">
+            <div class="timeblock">
+              <div class="time">08:30</div>
+              <div><strong>热水塘 → 热阿线 → 黄岗梁。</strong>这段山路和森林草甸层次最好，弯道多，按 40-60km/h 慢开。</div>
+            </div>
+            <div class="timeblock">
+              <div class="time">11:30</div>
+              <div><strong>阿斯哈图石林。</strong>如果人多，只走一、二景区精华，2 小时即可；如果天气差，把石林改为车览+咖啡/休息。</div>
+            </div>
+            <div class="timeblock">
+              <div class="time">14:30</div>
+              <div><strong>转达达线。</strong>阿斯哈图 → 白音敖包 → 贡格尔草原 → 达里湖，重点是路边安全停车、慢拍，不赶全程。</div>
+            </div>
+            <div class="timeblock">
+              <div class="time">18:30</div>
+              <div><strong>达里湖日落。</strong>天晴住达里湖/达来诺日镇附近；若住宿条件不满意，日落前撤回经棚，避免摸黑走草原路。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="day">
+          <div class="date">6/21<br>周日</div>
+          <div class="card">
+            <div class="timeblock">
+              <div class="time">09:00</div>
+              <div><strong>慢起床。</strong>达里湖边散步、贡格尔草原补拍，或者直接经棚吃早午饭。</div>
+            </div>
+            <div class="timeblock">
+              <div class="time">11:00</div>
+              <div><strong>返赤峰。</strong>留足 4-5 小时给还车、加油、堵车和车况检查。</div>
+            </div>
+            <div class="timeblock">
+              <div class="time">17:00后</div>
+              <div><strong>赤峰 → 北京朝阳。</strong>参考现有晚间车次区间返京；如果纯自驾，建议 10:30 前从经棚出发返京。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>路线逻辑</h2>
+      <div class="grid cols-2">
+        <div class="card route">
+          <h3>高铁租车版</h3>
+          <div class="route-step"><span class="dot"></span><span>北京朝阳 → 赤峰站</span></div>
+          <div class="route-step"><span class="dot line-dot"></span><span>赤峰取车 → 热水塘住温泉</span></div>
+          <div class="route-step"><span class="dot line-dot"></span><span>热阿线 → 黄岗梁 → 阿斯哈图石林</span></div>
+          <div class="route-step"><span class="dot line-dot"></span><span>达达线 → 贡格尔草原 → 达里湖</span></div>
+          <div class="route-step"><span class="dot"></span><span>达里湖/经棚 → 赤峰还车 → 北京</span></div>
+        </div>
+        <div class="card route">
+          <h3>纯自驾版</h3>
+          <div class="route-step"><span class="dot"></span><span>6/18晚：北京 → 承德或赤峰过夜</span></div>
+          <div class="route-step"><span class="dot line-dot"></span><span>6/19：承德/赤峰 → 经棚/热水塘</span></div>
+          <div class="route-step"><span class="dot line-dot"></span><span>6/20：热阿线 + 达达线精华</span></div>
+          <div class="route-step"><span class="dot"></span><span>6/21：经棚/达里湖 → 北京，全日返程</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>酒店规划</h2>
+      <div class="grid cols-3">
+        <div class="card">
+          <h3>6/18 赤峰</h3>
+          <p>住赤峰站、市政府或万达周边，核心要求是停车/近取车点/早餐早。连锁酒店比景区民宿稳定。</p>
+          <p class="note">适合：6/18晚高铁前置。</p>
+        </div>
+        <div class="card">
+          <h3>6/19 热水塘或经棚</h3>
+          <p>热水塘适合温泉和第二天进热阿线；经棚适合住宿质量、补给、餐饮和充电。情侣休闲更推荐热水塘，洁癖或睡眠敏感选经棚。</p>
+        </div>
+        <div class="card">
+          <h3>6/20 达里湖/达来诺日或经棚</h3>
+          <p>想看日落星空住达里湖附近；想洗澡安静和第二天返程稳，住经棚。不要日落后临时再找很远的住宿。</p>
+        </div>
+      </div>
+      <p class="note">端午假期建议订“可免费取消”的两套：热水塘/经棚各一套，出发前 3-5 天看天气和路况再保留最终方案。具体候选见 <a href="choices.html#hotels">酒店 Top3 副页</a>。</p>
+    </section>
+
+    <section>
+      <h2>美食规划</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>该吃什么</h3>
+          <ul>
+            <li>手把肉、烤羊排、羊肉串：适合热水塘/经棚晚餐。</li>
+            <li>蒙古奶茶、奶豆腐、蒙古果子：适合早餐或下午加餐。</li>
+            <li>达里湖华子鱼：达里湖区域特色，点菜时问清是否正规渠道和当日做法。</li>
+            <li>路餐：牛肉干、面包、水果、热水，6月草原路边不一定随时有餐馆。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>怎么吃更舒服</h3>
+          <ul>
+            <li>第一晚别点太多重口羊肉，第二天山路容易不舒服。</li>
+            <li>午餐尽量简单，晚餐再吃特色菜。</li>
+            <li>景区附近先看菜单和评价再坐下，鱼类按斤计价要提前确认。</li>
+            <li>每天车上至少放 2-3L 水，草原日晒和风都会加速脱水。</li>
+          </ul>
+        </div>
+      </div>
+      <p class="note">沿线餐厅更依赖当日营业和食材，建议出发前一天电话确认。候选餐厅见 <a href="choices.html#restaurants">餐厅 Top3 副页</a>。</p>
+    </section>
+
+    <section>
+      <h2>天气与装备</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>天气判断</h3>
+          <p>克什克腾 6 月常年参考是白天 20 多度、夜里明显降温。租租车气候页给出的 6 月平均为 15-28℃、平均降水 66mm；2025 年 6 月历史统计为平均高温 26℃、平均低温 10℃，且当月有 9 个雨日、总降雨 173.6mm。</p>
+          <p><strong>结论：</strong>今年具体天气还要临近 7-10 天再看，但端午需要同时准备防晒、风和阵雨。</p>
+        </div>
+        <div class="card">
+          <h3>建议携带</h3>
+          <ul>
+            <li>薄冲锋衣或防风外套、长裤、帽子、墨镜。</li>
+            <li>防晒霜、润唇膏、保湿、驱蚊、常用肠胃药。</li>
+            <li>车载充电器、离线地图、纸巾湿巾、垃圾袋。</li>
+            <li>雨天备用鞋；草地拍照别穿难清理的浅色鞋。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>特殊情况预案</h2>
+      <table>
+        <thead>
+          <tr><th>情况</th><th>处理</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>6/20 下雨或雷暴</td>
+            <td>不去高处长时间停留；阿斯哈图改短停，热阿线只走柏油主路；下午回热水塘温泉或经棚休息。</td>
+          </tr>
+          <tr>
+            <td>达达线局部修路/碎石</td>
+            <td>不要硬闯非铺装草原路。优先走导航主路，必要时从阿斯哈图折回经棚，把达里湖改为 6/21 上午短线。</td>
+          </tr>
+          <tr>
+            <td>租不到 SUV</td>
+            <td>轿车也能走多数柏油路，但放弃土路、湖边小路和夜路；保险加到更高档，取车时重点拍轮胎和底盘外观。</td>
+          </tr>
+          <tr>
+            <td>高铁票紧张</td>
+            <td>优先抢 6/18 晚赤峰；失败则 6/19 早班。再失败才切纯自驾，并把第一天景点全部删掉，只入住和吃饭。</td>
+          </tr>
+          <tr>
+            <td>人流超预期</td>
+            <td>阿斯哈图只早进或晚进；中午留给路边草原、白音敖包外围、咖啡/车内休息。不要为了景区排队牺牲整天节奏。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>出发前清单</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>现在就可以做</h3>
+          <ul>
+            <li>先订可取消酒店：赤峰 6/18、热水塘/经棚 6/19、达里湖/经棚 6/20。</li>
+            <li>先锁可取消 SUV，取还点优先赤峰站，其次玉龙机场或市区。</li>
+            <li>收藏 12306 起售提醒，按 15 天预售期盯 6/19 和 6/21 车票。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>临出发 3 天</h3>
+          <ul>
+            <li>看克什克腾、热水塘、阿斯哈图、达里湖逐小时天气。</li>
+            <li>电话问酒店：热阿线/达达线路况、是否修路、是否有晚餐。</li>
+            <li>下载离线地图，标记加油站、住宿、备用酒店。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>资料来源</h2>
+      <ul>
+        <li><a href="https://www.12306.cn/">铁路12306</a>：官方购票渠道；12306 公告显示铁路客票预售期为 15 天。</li>
+        <li><a href="https://train.hao86.com/G3661/">好查列车时刻表 G3661</a>、<a href="https://train.hao86.com/%E5%8C%97%E4%BA%AC%E6%9C%9D%E9%98%B3-%E8%B5%A4%E5%B3%B0/">北京朝阳-赤峰车次页</a>：北京朝阳至赤峰高铁时刻参考。</li>
+        <li><a href="https://chifeng.zuche.com/">神州租车赤峰网点</a>：赤峰站、玉龙机场等租车点参考。</li>
+        <li><a href="https://www.icauto.com.cn/route/101_1452.html">车主手册北京到克什克腾旗路线</a>：北京到克旗自驾里程和耗时参考。</li>
+        <li><a href="https://touch.go.qunar.com/utilinfo/407?destId=1003263&destType=1">去哪儿克什克腾旗交通</a>：克旗交通方式、经棚到热水/达里湖/阿斯哈图距离和加油提示。</li>
+        <li><a href="https://www.nmgs.org.cn/web/doc/d-1574.html">这里是草原：克什克腾石阵</a>：阿斯哈图石林位置、交通、门票和景区特征。</li>
+        <li><a href="https://www.tianqi24.com/keshiketeng/history202506.html">天气24：克什克腾 2025 年 6 月历史天气</a>、<a href="https://chacha.zuzuche.com/weather/c2859_m6.html">租租车：克什克腾 6 月气候</a>：温度和降水参考。</li>
+        <li><a href="https://www.spp.gov.cn/spp/dfjcdt/202601/t20260126_716842.shtml">最高人民检察院：达里湖华子鱼</a>：地方特色鱼类与品牌信息。</li>
+        <li>图片来自 Wikimedia Commons：Gongger Grasslands、Grassland Road、Granite Pillars Labyrinth，原作者 rheins / Panoramio，CC BY 3.0。</li>
+      </ul>
+      <p class="note">页面生成时间：2026-05-17。车次、门票、酒店、租车和路况属于可变信息，出发前请再次核验。</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="hero-inner">
+      <strong>一句话执行版</strong>
+      <span>能 6/18 晚走就先到赤峰；6/19 赤峰租 SUV 到热水塘；6/20 慢走热阿线和达达线；6/21 从达里湖/经棚回赤峰坐高铁返京。</span>
+    </div>
+  </footer>
+</body>
+</html>

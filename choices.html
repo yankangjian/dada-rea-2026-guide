@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>酒店与餐厅 Top3 - 达达线热阿线端午攻略</title>
+  <style>
+    :root {
+      --ink: #1f2933;
+      --muted: #5f6f7a;
+      --paper: #f7f4ed;
+      --panel: #ffffff;
+      --line: #d8d0c2;
+      --grass: #436b4f;
+      --lake: #286c7c;
+      --sun: #b85c38;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.62;
+    }
+    a { color: var(--lake); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header {
+      min-height: 44vh;
+      display: grid;
+      align-items: end;
+      color: #fff;
+      padding: 38px 20px;
+      background:
+        linear-gradient(180deg, rgba(20, 35, 32, .1), rgba(20, 35, 32, .7)),
+        url("https://commons.wikimedia.org/wiki/Special:FilePath/%E7%9F%B3%E6%9E%97%E8%BF%B7%E5%AE%AB_-_Granite_Pillars_Labyrinth_-_2011.06_-_panoramio.jpg?width=1600") center/cover;
+    }
+    .wrap { width: min(1100px, calc(100% - 36px)); margin: 0 auto; }
+    h1 { margin: 12px 0 8px; font-size: clamp(34px, 6vw, 64px); line-height: 1.05; }
+    h2 { margin: 0 0 14px; font-size: 26px; }
+    h3 { margin: 0 0 8px; font-size: 20px; }
+    main { padding: 28px 0 56px; }
+    section { margin: 32px 0; }
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 8px 13px;
+      border: 1px solid var(--lake);
+      border-radius: 7px;
+      background: var(--lake);
+      color: #fff;
+      font-weight: 700;
+    }
+    .button.secondary { background: #fff; color: var(--lake); }
+    .button:hover { text-decoration: none; filter: brightness(.98); }
+    .grid { display: grid; gap: 16px; }
+    .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 1px 0 rgba(31,41,51,.04);
+    }
+    .rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--grass);
+      color: #fff;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .tag {
+      display: inline-flex;
+      margin: 0 6px 8px 0;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #e7efe9;
+      color: #284936;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .tag.alt { background: #e7f0f3; color: #1e5160; }
+    .tag.warn { background: #f5e8dc; color: #7b3d24; }
+    ul { margin: 8px 0 0; padding-left: 20px; }
+    li { margin: 5px 0; }
+    .note { color: var(--muted); font-size: 14px; }
+    .split { grid-template-columns: .9fr 1.1fr; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #e6ded1;
+      vertical-align: top;
+      text-align: left;
+    }
+    th { background: #edf2ee; color: #2d4536; }
+    tr:last-child td { border-bottom: 0; }
+    footer { background: #273036; color: #dce4e2; padding: 24px 0; }
+    @media (max-width: 860px) {
+      .cards, .split { grid-template-columns: 1fr; }
+      table { font-size: 14px; }
+      th, td { padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div>可选副页 · 2026 端午达达线-热阿线</div>
+      <h1>酒店与餐厅 Top3</h1>
+      <p>这些不是“必须打卡”，而是为了订房和吃饭时有可靠候选。端午价格、余房和营业会变，预订前仍要二次核验。</p>
+      <div class="nav">
+        <a class="button" href="index.html">返回主攻略</a>
+        <a class="button secondary" href="#hotels">酒店 Top3</a>
+        <a class="button secondary" href="#restaurants">餐厅 Top3</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2>选择逻辑</h2>
+      <p>这条线住宿不适合只看评分排序。更实用的顺序是：先保证第一晚或前置晚能顺利衔接高铁/取车，再决定要不要把一晚放在热水塘体验温泉，最后给达里湖日落预留“住湖边或回经棚”的机动。</p>
+      <p class="note">酒店评分主要参考 Trip.com/携程可见页面，餐厅主要参考 Trip.com/携程美食可见页面；评价数量少的店只作为候选，不作为绝对推荐。</p>
+    </section>
+
+    <section id="hotels">
+      <h2>酒店 Top3</h2>
+      <div class="grid cards">
+        <article class="card">
+          <span class="rank">1</span>
+          <h3>星程酒店（赤峰站东广场店）</h3>
+          <div>
+            <span class="tag">6/18 前置晚</span>
+            <span class="tag alt">高铁衔接</span>
+          </div>
+          <p>适合 6月18日晚高铁到赤峰后入住。Trip.com 可见评分 9.6/10、219 条评价，位置描述为步行约 15 分钟到赤峰站，早餐含中西式，作为前置晚比景区酒店稳定。</p>
+          <ul>
+            <li>优点：到站后少折腾，第二天取车出发顺。</li>
+            <li>注意：确认“赤峰站/赤峰高铁站”与租车门店距离，别订到赤峰南站附近。</li>
+          </ul>
+          <p><a href="https://www.trip.com/hotels/Chifeng-hotel-detail-111256637/Starway-Hotel-%28East-Plaza-of-Chifeng-Railway-Station%29" target="_blank" rel="noreferrer">查看参考页面</a></p>
+        </article>
+
+        <article class="card">
+          <span class="rank">2</span>
+          <h3>尚客优酒店（克什克腾旗政府旅游商贸广场店）</h3>
+          <div>
+            <span class="tag">经棚镇</span>
+            <span class="tag alt">稳妥备选</span>
+          </div>
+          <p>适合把 6月19日或 6月20日晚放在经棚镇，牺牲一点温泉氛围，换更稳定的补给、餐饮和返程。Trip.com 可见评分 8.6/10、106 条评价，携程移动页显示 4.2 分、109 条客户评论。</p>
+          <ul>
+            <li>优点：经棚镇补给方便，天气差时更稳。</li>
+            <li>注意：这是功能型住宿，不是度假酒店；订前看近 3 个月差评。</li>
+          </ul>
+          <p><a href="https://us.trip.com/hotels/keshenketengqi-hotel-detail-130633525/shangkeyou-hotel/" target="_blank" rel="noreferrer">查看参考页面</a></p>
+        </article>
+
+        <article class="card">
+          <span class="rank">3</span>
+          <h3>热水塘锦澜温泉酒店</h3>
+          <div>
+            <span class="tag">热水塘</span>
+            <span class="tag warn">体验优先</span>
+          </div>
+          <p>适合 6月19日晚住热水塘，第二天直接进热阿线。Trip.com 可见清洁 8.0、位置 8.2、服务 8.0，219 条评价；页面提到热水塘、热阿线起点附近，餐饮出行方便。</p>
+          <ul>
+            <li>优点：温泉体验和路线位置好，适合情侣休闲。</li>
+            <li>注意：有评价提到设施旧、淋浴/浴缸体验不稳定；建议带一次性浴缸套。</li>
+          </ul>
+          <p><a href="https://www.trip.com/hotels/keshenketengqi-hotel-detail-5889088/ajitai-hot-spring-hotel/" target="_blank" rel="noreferrer">查看参考页面</a></p>
+        </article>
+      </div>
+
+      <div class="grid split" style="margin-top:16px">
+        <div class="card">
+          <h3>备选：天牧温泉接待中心</h3>
+          <p>Trip.com 可见 7.8/10、279 条评价，位置在热水塘温泉区，环境描述偏度假。可作为锦澜满房或价格过高时的热水塘替代。</p>
+          <p><a href="https://www.trip.com/hotels/keshenketengqi-hotel-detail-36191784/tianmu-hot-spring-reception-center-hotel/" target="_blank" rel="noreferrer">查看参考页面</a></p>
+        </div>
+        <div class="card">
+          <h3>订房策略</h3>
+          <ul>
+            <li>6/18：只订赤峰站/取车点附近，可取消。</li>
+            <li>6/19：热水塘和经棚各订一间可取消，出发前看天气保留其一。</li>
+            <li>6/20：达里湖附近住宿条件波动大，想看日落可住湖边，重视睡眠就回经棚。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="restaurants">
+      <h2>餐厅 Top3</h2>
+      <div class="grid cards">
+        <article class="card">
+          <span class="rank">1</span>
+          <h3>巴音杭盖蒙餐</h3>
+          <div>
+            <span class="tag">经棚/贡格尔街</span>
+            <span class="tag alt">蒙餐正餐</span>
+          </div>
+          <p>Trip.com 可见 5.0/5、6 条评价，地址在 Gongger Street、克什克腾兴源小区东南侧。评价里提到蒙古馅饼、炒米、华子鱼、手把肉、小锅奶茶。</p>
+          <ul>
+            <li>适合：住经棚镇当晚，或者从达达线回经棚后吃晚餐。</li>
+            <li>点菜：蒙古馅饼、手把肉、奶茶，鱼类先问价格和做法。</li>
+          </ul>
+          <p><a href="https://sa.trip.com/restaurant/china/hexigten-banner/detail/rest-16283009/" target="_blank" rel="noreferrer">查看参考页面</a></p>
+        </article>
+
+        <article class="card">
+          <span class="rank">2</span>
+          <h3>达里湖北岸人家蒙餐厅</h3>
+          <div>
+            <span class="tag">达里湖</span>
+            <span class="tag alt">湖边晚餐</span>
+          </div>
+          <p>Trip.com 可见 5.0/5、3 条评价，地址为克什克腾旗达里湖渔场 30 号北岸人家蒙餐厅。页面评价提到牛羊肉、鱼、份量和服务。</p>
+          <ul>
+            <li>适合：6月20日达里湖日落前后，顺路吃湖边蒙餐。</li>
+            <li>注意：评价量不大，建议到达前电话确认营业和是否接待散客。</li>
+          </ul>
+          <p><a href="https://www.trip.com/restaurant/china/hexigten-banner/detail/restaurant-148511529/" target="_blank" rel="noreferrer">查看参考页面</a></p>
+        </article>
+
+        <article class="card">
+          <span class="rank">3</span>
+          <h3>达里湖鱼宴城 / 鱼把头</h3>
+          <div>
+            <span class="tag">华子鱼</span>
+            <span class="tag warn">先问价</span>
+          </div>
+          <p>达里湖鱼宴城 Trip.com 页面可见 5.0/5、地址在达里湖渔场，电话 +86 476 5090102；携程美食“鱼把头”页面提到为了吃华子鱼而来、环境干净、老板服务好。</p>
+          <ul>
+            <li>适合：专门想吃达里湖华子鱼时作为候选。</li>
+            <li>注意：华子鱼有地理标志和真假货问题，点菜前问清来源、价格、斤两和做法。</li>
+          </ul>
+          <p><a href="https://www.trip.com/restaurant/china/hexigten-banner/detail/restaurant-16824311/" target="_blank" rel="noreferrer">鱼宴城参考</a> · <a href="https://gs.ctrip.com/html5/you/foods/2971/6507.html" target="_blank" rel="noreferrer">鱼把头参考</a></p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>怎么快速决策</h2>
+      <table>
+        <thead>
+          <tr><th>当天状态</th><th>住宿</th><th>吃饭</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>6/18 晚到赤峰</td>
+            <td>星程赤峰站东广场店，或同区域更高评分连锁。</td>
+            <td>到得晚就简单吃，别安排重餐。</td>
+          </tr>
+          <tr>
+            <td>6/19 天气好，想泡温泉</td>
+            <td>热水塘锦澜或天牧。</td>
+            <td>热水塘镇随缘吃蒙餐/家常菜，重点是早点休息。</td>
+          </tr>
+          <tr>
+            <td>6/19 天气差或怕住宿踩雷</td>
+            <td>尚客优经棚店或经棚同区域新酒店。</td>
+            <td>巴音杭盖蒙餐作为经棚正餐候选。</td>
+          </tr>
+          <tr>
+            <td>6/20 晴天看达里湖日落</td>
+            <td>湖边可体验民宿；睡眠敏感则回经棚。</td>
+            <td>北岸人家蒙餐厅或鱼宴城，提前电话确认。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>来源与核验提醒</h2>
+      <ul>
+        <li>酒店：Trip.com 星程赤峰站东广场店、尚客优克什克腾旗政府旅游商贸广场店、热水塘锦澜温泉酒店、天牧温泉接待中心页面；携程尚客优移动酒店页。</li>
+        <li>餐厅：Trip.com 巴音杭盖蒙餐、达里湖北岸人家蒙餐厅、达里湖鱼宴城页面；携程美食鱼把头页面。</li>
+        <li>华子鱼：最高人民检察院 2026-01-26 关于“达里湖华子鱼”地理标志产品保护报道。</li>
+      </ul>
+      <p class="note">页面生成时间：2026-05-17。端午实际价格、营业时间、余房、菜单和路况都需要出发前复查。</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">建议执行：先订可取消，再按天气和票况保留最终方案。</div>
+  </footer>
+</body>
+</html>

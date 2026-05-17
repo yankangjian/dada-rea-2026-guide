@@ -277,14 +277,14 @@
 
     var routeIds = ["chifeng", "reshui", "huanggangliang", "ashatu", "baiyin", "gongger", "dali", "jingpeng-hotel", "chifeng"];
     var routeEstimates = {
-      "chifeng-reshui": { day: "6/19", time: "14:30-17:30", distance: "约 215 km", duration: "约 3 小时", note: "赤峰取车后直奔热水塘，晚上泡温泉休整" },
-      "reshui-huanggangliang": { day: "6/20", time: "09:30-11:00", distance: "约 55 km", duration: "约 1.5 小时", note: "热阿线森林草原段，慢开找安全停车点" },
-      "huanggangliang-ashatu": { day: "6/20", time: "11:20-13:00", distance: "约 65 km", duration: "约 1.5 小时", note: "山路多，预留拍照和午餐弹性" },
-      "ashatu-baiyin": { day: "6/20", time: "15:00-17:00", distance: "约 90 km", duration: "约 2 小时", note: "石林游玩后转向达达线，不建议太晚出发" },
-      "baiyin-gongger": { day: "6/20", time: "17:00-17:45", distance: "约 35 km", duration: "约 45 分钟", note: "草原路段，适合慢开和短停" },
-      "gongger-dali": { day: "6/20", time: "17:45-19:00", distance: "约 60 km", duration: "约 1.2 小时", note: "往达里湖日落方向，视天气决定是否停留" },
-      "dali-jingpeng-hotel": { day: "6/20", time: "19:30-21:00", distance: "约 85 km", duration: "约 1.5 小时", note: "如果看完日落再回经棚，不要拖到太晚" },
-      "jingpeng-hotel-chifeng": { day: "6/21", time: "09:30-13:00", distance: "约 250 km", duration: "约 3.5 小时", note: "返程还车段，给高铁留足缓冲" }
+      "chifeng-reshui": { day: "6/19", time: "14:30-17:30", distance: "238 km", duration: "约 156 分钟", note: "赤峰取车后直奔热水塘，晚上泡温泉休整", source: "2026/5/17 已刷新" },
+      "reshui-huanggangliang": { day: "6/20", time: "09:30-10:45", distance: "60 km", duration: "约 65 分钟", note: "热阿线森林草原段，慢开找安全停车点", source: "2026/5/17 已刷新" },
+      "huanggangliang-ashatu": { day: "6/20", time: "11:15-13:20", distance: "148 km", duration: "约 123 分钟", note: "这段比初估更长，午餐和石林停留要留弹性", source: "2026/5/17 已刷新" },
+      "ashatu-baiyin": { day: "6/20", time: "15:10-16:15", distance: "63 km", duration: "约 61 分钟", note: "石林游玩后转向达达线，不建议太晚出发", source: "2026/5/17 已刷新" },
+      "baiyin-gongger": { day: "6/20", time: "16:25-17:00", distance: "32 km", duration: "约 31 分钟", note: "草原路段，适合慢开和短停", source: "2026/5/17 已刷新" },
+      "gongger-dali": { day: "6/20", time: "17:10-17:45", distance: "34 km", duration: "约 31 分钟", note: "往达里湖日落方向，视天气决定是否停留", source: "2026/5/17 已刷新" },
+      "dali-jingpeng-hotel": { day: "6/20", time: "19:30-20:35", distance: "81 km", duration: "约 63 分钟", note: "如果看完日落再回经棚，不要拖到太晚", source: "2026/5/17 已刷新" },
+      "jingpeng-hotel-chifeng": { day: "6/21", time: "09:30-12:40", distance: "205 km", duration: "约 189 分钟", note: "返程还车段，给高铁留足缓冲", source: "2026/5/17 已刷新" }
     };
     var routeResults = readRouteResults();
     var map;
@@ -554,7 +554,7 @@
         var actual = routeResults[key];
         var distance = actual ? actual.distance : estimate.distance;
         var duration = actual ? actual.duration : estimate.duration;
-        var source = actual ? "已刷新 " + actual.updatedAt : "行程估算";
+        var source = actual ? "已刷新 " + actual.updatedAt : (estimate.source || "行程估算");
         var div = document.createElement("div");
         div.className = "route-leg";
         div.innerHTML = "<strong>" + escapeHtml(estimate.day + " " + estimate.time) + "</strong><br>" +

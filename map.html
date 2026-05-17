@@ -146,6 +146,24 @@
       background: #fff;
     }
     .place strong { line-height: 1.3; }
+    .diagnostics {
+      margin-top: 12px;
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+    }
+    .diag-row {
+      padding: 7px 9px;
+      border: 1px solid #e5ded1;
+      border-radius: 7px;
+      background: #fbfcf8;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+    .diag-row strong {
+      color: var(--ink);
+      margin-right: 6px;
+    }
     footer {
       padding: 24px 0;
       background: #273036;
@@ -176,7 +194,7 @@
     <div class="wrap">
       <div>高德地图 · 真实底图与驾车路线</div>
       <h1>达达线-热阿线行程地图</h1>
-      <p>使用高德 JS API 真实底图、地理编码和驾车路线服务，标注交通节点、景区、酒店、餐厅，并绘制赤峰取还车环线。</p>
+      <p>使用高德 JS API 真实底图，默认用内置坐标标注交通节点、景区、酒店、餐厅，并绘制赤峰取还车环线；驾车路线可手动慢速计算。</p>
       <div class="nav">
         <a class="button secondary" href="index.html">返回主攻略</a>
         <a class="button secondary" href="choices.html">酒店/餐厅 Top3</a>
@@ -195,11 +213,14 @@
         <input id="amap-security" type="password" autocomplete="off" placeholder="粘贴 securityJsCode">
         <div class="actions">
           <button type="button" onclick="saveAndLoadMap()">加载地图</button>
+          <button class="secondary" type="button" onclick="runDiagnostics()">运行诊断</button>
+          <button class="secondary" type="button" onclick="calculateDrivingRoutes()">慢速计算驾车路线</button>
           <button class="secondary" type="button" onclick="clearAmapKey()">清除本机保存</button>
           <a class="button" href="https://uri.amap.com/navigation?from=118.895884,42.273811,%E8%B5%A4%E5%B3%B0%E7%AB%99&to=117.535164,43.930911,%E9%98%BF%E6%96%AF%E5%93%88%E5%9B%BE%E7%9F%B3%E6%9E%97&mode=car&policy=1&src=dada-rea-guide&coordinate=gaode&callnative=0" target="_blank" rel="noreferrer">打开高德导航示例</a>
         </div>
-        <p id="load-status" class="note">未加载地图。填写 Key 和安全密钥后点击“加载地图”。</p>
+        <p id="load-status" class="note">未加载地图。填写 Key 和安全密钥后点击“加载地图”。默认只画点位和行程线，避免触发高德接口限流。</p>
         <p id="load-detail" class="note"></p>
+        <div id="diagnostics" class="diagnostics"></div>
 
         <h2 style="margin-top:22px">图例</h2>
         <div class="legend">
@@ -251,6 +272,8 @@
     var map;
     var resolved = {};
     var loaderPromise;
+    var activeAMap;
+    var drivingRouteStarted = false;
 
     function setStatus(message) {
       document.getElementById("load-status").textContent = message;
@@ -258,6 +281,32 @@
 
     function setDetail(message) {
       document.getElementById("load-detail").textContent = message || "";
+    }
+
+    function clearDiagnostics() {
+      document.getElementById("diagnostics").innerHTML = "";
+    }
+
+    function addDiagnostic(label, detail) {
+      var row = document.createElement("div");
+      row.className = "diag-row";
+      row.innerHTML = "<strong>" + escapeHtml(label) + "</strong>" + escapeHtml(detail || "");
+      document.getElementById("diagnostics").appendChild(row);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function maskValue(value) {
+      if (!value) return "未填写";
+      if (value.length <= 8) return value.length + " 位，长度偏短";
+      return value.slice(0, 4) + "..." + value.slice(-4) + "，共 " + value.length + " 位";
     }
 
     function amapSearchUrl(place) {
@@ -274,6 +323,10 @@
     function saveAndLoadMap() {
       var key = document.getElementById("amap-key").value.trim();
       var security = document.getElementById("amap-security").value.trim();
+      clearDiagnostics();
+      addDiagnostic("页面域名", location.origin);
+      addDiagnostic("Key", maskValue(key));
+      addDiagnostic("securityJsCode", maskValue(security));
       if (!key || !security) {
         setStatus("请先填写 Key 和 securityJsCode。");
         setDetail("");
@@ -288,17 +341,41 @@
       removeCredential("dadaReaAmapSecurity");
       document.getElementById("amap-key").value = "";
       document.getElementById("amap-security").value = "";
+      clearDiagnostics();
       setStatus("已清除本机保存的高德 Key。");
       setDetail("如果刚刚加载失败，重新填写后再点“加载地图”。");
+    }
+
+    function runDiagnostics() {
+      var key = document.getElementById("amap-key").value.trim();
+      var security = document.getElementById("amap-security").value.trim();
+      clearDiagnostics();
+      addDiagnostic("页面 URL", location.href);
+      addDiagnostic("页面域名", location.origin);
+      addDiagnostic("浏览器在线", navigator.onLine ? "是" : "否");
+      addDiagnostic("Key", maskValue(key));
+      addDiagnostic("securityJsCode", maskValue(security));
+      try {
+        localStorage.setItem("dadaReaDiag", "ok");
+        localStorage.removeItem("dadaReaDiag");
+        addDiagnostic("localStorage", "可写");
+      } catch (error) {
+        addDiagnostic("localStorage", "不可写：" + errorMessage(error));
+      }
+      if (window.AMapLoader) addDiagnostic("AMapLoader", "已存在");
+      if (window.AMap) addDiagnostic("AMap", "已存在");
+      if (key && security) loadAmap(key, security);
     }
 
     function saveCredentials(key, security) {
       try {
         localStorage.setItem("dadaReaAmapKey", key);
         localStorage.setItem("dadaReaAmapSecurity", security);
+        addDiagnostic("localStorage", "Key 和 securityJsCode 已保存");
         setDetail("凭据已保存到当前浏览器。下次打开这个页面会自动加载地图。");
         return true;
       } catch (error) {
+        addDiagnostic("localStorage", "保存失败：" + errorMessage(error));
         setStatus("浏览器没有保存高德凭据。");
         setDetail("请检查是否使用了无痕模式、禁用了本地存储，或浏览器阻止了 GitHub Pages 的站点数据。");
         return false;
@@ -325,7 +402,9 @@
       setStatus("正在加载高德地图...");
       setDetail("当前页面不会把 Key 写入源码，只保存在这个浏览器。");
       window._AMapSecurityConfig = { securityJsCode: security };
+      addDiagnostic("安全配置", "已在加载 JSAPI 前设置 _AMapSecurityConfig");
       loadAmapLoader().then(function () {
+        addDiagnostic("AMapLoader", "loader.js 已加载，开始加载 JSAPI 2.0");
         return window.AMapLoader.load({
           key: key,
           version: "2.0",
@@ -333,10 +412,12 @@
         });
       }).then(function (AMapInstance) {
         window.AMap = AMapInstance;
+        addDiagnostic("JSAPI", "加载成功");
         initMap(AMapInstance);
       }).catch(function (error) {
         setStatus("高德地图加载失败。");
-        setDetail(errorMessage(error) + "。请重点检查：Key 类型是否为 Web端(JS API)、securityJsCode 是否匹配、白名单是否包含 yankangjian.github.io。");
+        addDiagnostic("JSAPI 错误", errorMessage(error));
+        setDetail(errorMessage(error) + "。请重点检查：Key 类型是否为 Web端(JS API)、securityJsCode 是否匹配、白名单是否包含 yankangjian.github.io 和 https://yankangjian.github.io。");
       });
     }
 
@@ -346,8 +427,14 @@
       loaderPromise = new Promise(function (resolve, reject) {
         var script = document.createElement("script");
         script.src = "https://webapi.amap.com/loader.js";
-        script.onload = function () { resolve(); };
-        script.onerror = function () { reject(new Error("AMapLoader 脚本加载失败")); };
+        addDiagnostic("loader.js", "开始请求 https://webapi.amap.com/loader.js");
+        script.onload = function () {
+          addDiagnostic("loader.js", "脚本加载完成");
+          resolve();
+        };
+        script.onerror = function () {
+          reject(new Error("AMapLoader 脚本加载失败，可能是网络无法访问 webapi.amap.com"));
+        };
         document.head.appendChild(script);
         window.setTimeout(function () {
           if (!window.AMapLoader) reject(new Error("AMapLoader 超过 10 秒仍未就绪"));
@@ -388,6 +475,8 @@
     }
 
     function initMap(AMap) {
+      activeAMap = AMap;
+      drivingRouteStarted = false;
       if (map) map.destroy();
       resolved = {};
       map = new AMap.Map("map", {
@@ -396,42 +485,30 @@
         viewMode: "2D",
         mapStyle: "amap://styles/normal"
       });
+      addDiagnostic("地图容器", "地图实例已创建");
       map.addControl(new AMap.Scale());
       map.addControl(new AMap.ToolBar({ position: { right: "16px", top: "16px" } }));
-      setStatus("正在定位地点并计算路线...");
+      setStatus("正在绘制行程点位...");
       setDetail("");
-      geocodePlaces(AMap).then(function () {
+      resolveFallbackPlaces(AMap).then(function () {
         addMarkers(AMap);
         drawScenicPolyline(AMap);
-        drawDrivingRoute(AMap);
-        setStatus("高德地图已加载。路线为分段驾车规划，实际导航仍以出发当天为准。");
-        setDetail("如果某段路线计算失败，通常是景区线性路段或草原道路在路线服务里匹配不稳定，页面会保留近似景观线。");
+        renderRouteLinks();
+        setStatus("高德地图已加载。已使用内置坐标画出点位和行程线。");
+        setDetail("检测到你在高德控制台看到超限提示，所以页面默认不再自动请求地理编码和驾车路线。需要实际道路路线时，点“慢速计算驾车路线”。");
       }).catch(function (error) {
         setStatus("地点解析失败。");
         setDetail(errorMessage(error));
       });
     }
 
-    function geocodePlaces(AMap) {
-      return new Promise(function (resolve, reject) {
-        if (!AMap.Geocoder) {
-          reject(new Error("AMap.Geocoder 插件未加载"));
-          return;
-        }
-        var geocoder = new AMap.Geocoder({ city: "赤峰" });
-        var pending = places.map(function (place) {
-          return new Promise(function (done) {
-            geocoder.getLocation(place.query, function (status, result) {
-              if (status === "complete" && result.geocodes && result.geocodes.length) {
-                resolved[place.id] = result.geocodes[0].location;
-              } else {
-                resolved[place.id] = new AMap.LngLat(place.fallback[0], place.fallback[1]);
-              }
-              done();
-            });
-          });
+    function resolveFallbackPlaces(AMap) {
+      return new Promise(function (resolve) {
+        places.forEach(function (place) {
+          resolved[place.id] = new AMap.LngLat(place.fallback[0], place.fallback[1]);
         });
-        Promise.all(pending).then(resolve);
+        addDiagnostic("点位", "使用页面内置坐标 " + places.length + " 个，未调用高德地理编码接口");
+        resolve();
       });
     }
 
@@ -472,11 +549,46 @@
       }).setMap(map);
     }
 
+    function renderRouteLinks() {
+      var summary = document.getElementById("route-summary");
+      summary.innerHTML = "";
+      for (var i = 0; i < routeIds.length - 1; i += 1) {
+        var from = places.find(function (p) { return p.id === routeIds[i]; });
+        var to = places.find(function (p) { return p.id === routeIds[i + 1]; });
+        if (!from || !to) continue;
+        var div = document.createElement("div");
+        div.className = "route-leg";
+        div.innerHTML = (i + 1) + ". " + escapeHtml(from.name) + " → " + escapeHtml(to.name) +
+          ' · <a target="_blank" rel="noreferrer" href="' + navigationUrl(from, to) + '">在高德打开</a>';
+        summary.appendChild(div);
+      }
+    }
+
+    function navigationUrl(from, to) {
+      var start = from.fallback[0] + "," + from.fallback[1] + "," + encodeURIComponent(from.name);
+      var end = to.fallback[0] + "," + to.fallback[1] + "," + encodeURIComponent(to.name);
+      return "https://uri.amap.com/navigation?from=" + start + "&to=" + end + "&mode=car&policy=1&src=dada-rea-guide&coordinate=gaode&callnative=0";
+    }
+
+    function calculateDrivingRoutes() {
+      if (!activeAMap || !map) {
+        setStatus("请先加载地图，再计算驾车路线。");
+        return;
+      }
+      if (drivingRouteStarted) {
+        setDetail("驾车路线正在计算或已经计算过。若高德控制台仍显示超限，请稍后再试。");
+        return;
+      }
+      drivingRouteStarted = true;
+      drawDrivingRoute(activeAMap);
+    }
+
     function drawDrivingRoute(AMap) {
       var summary = document.getElementById("route-summary");
       summary.innerHTML = "";
       if (!AMap.Driving) {
         summary.innerHTML = '<div class="route-leg">路线插件未加载成功，请检查 Key 权限或稍后重试。</div>';
+        addDiagnostic("路线插件", "AMap.Driving 不存在");
         return;
       }
       var legs = [];
@@ -485,7 +597,19 @@
         var to = places.find(function (p) { return p.id === routeIds[i + 1]; });
         if (from && to && resolved[from.id] && resolved[to.id]) legs.push([from, to]);
       }
-      legs.forEach(function (leg, index) {
+      addDiagnostic("路线规划", "慢速串行计算 " + legs.length + " 段，每段间隔 1.2 秒，避免并发触发限流");
+      setStatus("正在慢速计算高德驾车路线...");
+      calculateRouteLegs(AMap, legs, 0);
+    }
+
+    function calculateRouteLegs(AMap, legs, index) {
+      if (index >= legs.length) {
+        setStatus("高德驾车路线计算完成。实际导航仍以出发当天高德 App 为准。");
+        return;
+      }
+      var leg = legs[index];
+      var summary = document.getElementById("route-summary");
+      window.setTimeout(function () {
         var driving = new AMap.Driving({
           map: map,
           hideMarkers: true,
@@ -499,13 +623,15 @@
             text += " · " + Math.round(route.distance / 1000) + " km · 约 " + Math.round(route.time / 60) + " 分钟";
           } else {
             text += " · 路线计算失败，请跳转高德 App 复核";
+            addDiagnostic("路线失败", text + "；" + errorMessage(result));
           }
           var div = document.createElement("div");
           div.className = "route-leg";
           div.textContent = text;
           summary.appendChild(div);
+          calculateRouteLegs(AMap, legs, index + 1);
         });
-      });
+      }, index === 0 ? 0 : 1200);
     }
 
     renderPlaceList();
@@ -525,6 +651,10 @@
       setStatus("高德地图初始化失败：" + reason);
     });
     if (savedKey && savedSecurity) {
+      clearDiagnostics();
+      addDiagnostic("页面域名", location.origin);
+      addDiagnostic("Key", maskValue(savedKey));
+      addDiagnostic("securityJsCode", maskValue(savedSecurity));
       setStatus("检测到本机已保存高德凭据，正在自动加载地图...");
       loadAmap(savedKey, savedSecurity);
     }

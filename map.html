@@ -4,6 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>高德真实地图与路线 - 达达线热阿线端午攻略</title>
+  <script>
+    window.DADA_REA_AMAP_CONFIG = {
+      key: "c60f29bedffedb499ea15ea23f78f0f9",
+      security: "6d0948901329100d54c2d57e786832e5"
+    };
+    window._AMapSecurityConfig = {
+      securityJsCode: window.DADA_REA_AMAP_CONFIG.security
+    };
+  </script>
+  <script src="https://webapi.amap.com/loader.js"></script>
   <style>
     :root {
       --ink: #1f2933;
@@ -214,15 +224,17 @@
 
         <h2 style="margin-top:22px">互动地图</h2>
         <div class="actions">
-          <button type="button" onclick="saveAndLoadMap()">打开地图</button>
+          <button type="button" onclick="saveAndLoadMap()">重新打开地图</button>
           <button class="secondary" type="button" onclick="calculateDrivingRoutes()">刷新实际车程</button>
           <button class="secondary" type="button" onclick="copyRouteResults()">复制实际车程结果</button>
-          <button class="secondary" type="button" onclick="copyRouteShape()">复制路线折线数据</button>
+          <button class="secondary" type="button" onclick="downloadRouteShapeJson()">下载路线JSON</button>
+          <button class="secondary" type="button" onclick="copyRouteShapeJson()">复制路线JSON</button>
           <a class="button" href="https://uri.amap.com/navigation?from=118.895884,42.273811,%E8%B5%A4%E5%B3%B0%E7%AB%99&to=117.535164,43.930911,%E9%98%BF%E6%96%AF%E5%93%88%E5%9B%BE%E7%9F%B3%E6%9E%97&mode=car&policy=1&src=dada-rea-guide&coordinate=gaode&callnative=0" target="_blank" rel="noreferrer">打开高德导航示例</a>
         </div>
-        <p id="load-status" class="note">地图打开后会显示点位、行程线和路线摘要。</p>
+        <p id="load-status" class="note">正在自动打开地图...</p>
         <p id="load-detail" class="note"></p>
-        <details style="margin-top:12px">
+        <p id="route-data-status" class="note">正在读取本地路线 JSON...</p>
+        <details style="margin-top:12px" hidden>
           <summary>地图授权设置</summary>
           <p class="note">同一台设备同一浏览器输入一次即可保存，之后会自动打开地图。</p>
           <label for="amap-key">地图授权码</label>
@@ -293,7 +305,9 @@
     var loaderPromise;
     var activeAMap;
     var drivingRouteStarted = false;
-    var routeShape = readRouteShape();
+    var routeShape = [];
+    var routeShapeSource = "未加载";
+    var routeShapeFile = "data/route-shape.json";
 
     function setStatus(message) {
       document.getElementById("load-status").textContent = message;
@@ -301,6 +315,11 @@
 
     function setDetail(message) {
       document.getElementById("load-detail").textContent = message || "";
+    }
+
+    function setRouteDataStatus(message) {
+      var node = document.getElementById("route-data-status");
+      if (node) node.textContent = message;
     }
 
     function clearDiagnostics() {
@@ -344,26 +363,26 @@
     }
 
     function saveAndLoadMap() {
-      var key = document.getElementById("amap-key").value.trim();
-      var security = document.getElementById("amap-security").value.trim();
+      var key = getAmapKey();
+      var security = getAmapSecurity();
       clearDiagnostics();
       if (!key || !security) {
-        setStatus("请先在“地图授权设置”里填写授权信息。");
-        setDetail("如果这台设备已经保存过授权，刷新页面后会自动打开地图。");
+        setStatus("地图授权没有配置。");
+        setDetail("请检查页面内置的高德 key 和安全码。");
         return;
       }
-      if (!saveCredentials(key, security)) return;
+      saveCredentials(key, security);
       loadAmap(key, security);
     }
 
     function clearAmapKey() {
       removeCredential("dadaReaAmapKey");
       removeCredential("dadaReaAmapSecurity");
-      document.getElementById("amap-key").value = "";
-      document.getElementById("amap-security").value = "";
+      document.getElementById("amap-key").value = getEmbeddedAmapConfig().key;
+      document.getElementById("amap-security").value = getEmbeddedAmapConfig().security;
       clearDiagnostics();
-      setStatus("已清除本机保存的地图授权。");
-      setDetail("重新填写后再点“打开地图”。");
+      setStatus("已恢复页面内置地图授权。");
+      setDetail("页面会继续使用内置 key 和安全码打开地图。");
     }
 
     function saveCredentials(key, security) {
@@ -395,6 +414,20 @@
       }
     }
 
+    function getEmbeddedAmapConfig() {
+      return window.DADA_REA_AMAP_CONFIG || { key: "", security: "" };
+    }
+
+    function getAmapKey() {
+      var input = document.getElementById("amap-key");
+      return (input && input.value.trim()) || getEmbeddedAmapConfig().key;
+    }
+
+    function getAmapSecurity() {
+      var input = document.getElementById("amap-security");
+      return (input && input.value.trim()) || getEmbeddedAmapConfig().security;
+    }
+
     function loadAmap(key, security) {
       setStatus("正在打开互动地图...");
       setDetail("地图打开后会显示点位和行程线。");
@@ -413,7 +446,7 @@
         initMap(AMapInstance);
       }).catch(function (error) {
         setStatus("互动地图暂时没有打开。");
-        setDetail("请检查地图授权设置是否允许这个网页访问。");
+        setDetail("请检查高德 key 的 Web 端白名单、服务权限和当前访问域名。");
       });
     }
 
@@ -614,6 +647,66 @@
       }
     }
 
+    function normalizeRouteShapePayload(payload) {
+      if (Array.isArray(payload)) return payload;
+      if (payload && Array.isArray(payload.shape)) return payload.shape;
+      if (payload && Array.isArray(payload.routeShape)) return payload.routeShape;
+      return [];
+    }
+
+    function validateRouteShape(points) {
+      if (!Array.isArray(points)) return [];
+      return points.filter(function (point) {
+        return Array.isArray(point) &&
+          point.length >= 2 &&
+          typeof point[0] === "number" &&
+          typeof point[1] === "number" &&
+          isFinite(point[0]) &&
+          isFinite(point[1]);
+      }).map(function (point) {
+        return [Number(point[0]), Number(point[1])];
+      });
+    }
+
+    function loadRouteShapeJson() {
+      return fetch(routeShapeFile, { cache: "no-store" }).then(function (response) {
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        return response.json();
+      }).then(function (payload) {
+        var points = validateRouteShape(normalizeRouteShapePayload(payload));
+        if (points.length > 1) {
+          routeShape = points;
+          routeShapeSource = routeShapeFile;
+          setRouteDataStatus("已加载路线 JSON：" + points.length + " 个折线点。");
+          return;
+        }
+        loadRouteShapeFromLocalStorage("路线 JSON 为空，暂用本机刷新缓存。");
+      }).catch(function () {
+        loadRouteShapeFromLocalStorage("未读到路线 JSON，暂用本机刷新缓存。");
+      });
+    }
+
+    function loadRouteShapeFromLocalStorage(prefix) {
+      var points = validateRouteShape(readRouteShape());
+      routeShape = points;
+      routeShapeSource = points.length > 1 ? "localStorage" : "fallback";
+      if (points.length > 1) {
+        setRouteDataStatus(prefix + " 已读取 " + points.length + " 个本机缓存点。");
+      } else {
+        setRouteDataStatus(prefix + " 当前会先显示景点连线。");
+      }
+    }
+
+    function routeShapePayload() {
+      return {
+        version: 1,
+        name: "dada-rea-2026-route-shape",
+        updatedAt: new Date().toISOString(),
+        source: routeShapeSource,
+        shape: routeShape
+      };
+    }
+
     function saveRouteShape() {
       try {
         localStorage.setItem("dadaReaRouteShape", JSON.stringify(routeShape));
@@ -683,6 +776,7 @@
             };
             routeResults[routeKey(leg[0], leg[1])] = refreshed;
             appendRouteShape(route);
+            routeShapeSource = "AMap Driving refresh";
             saveRouteResults();
             saveRouteShape();
             text += " · " + refreshed.distance + " · " + refreshed.duration;
@@ -750,23 +844,43 @@
       }
     }
 
-    function copyRouteShape() {
+    function copyRouteShapeJson() {
       if (!routeShape || routeShape.length < 2) {
-        setStatus("还没有可复制的路线折线。");
-        setDetail("先打开地图并点击“刷新实际车程”，等路线画出来后再复制。");
+        setStatus("还没有可复制的路线 JSON。");
+        setDetail("先打开地图并点击“刷新实际车程”，等路线画出来后再复制或下载。");
         return;
       }
-      var payload = JSON.stringify(routeShape);
+      var payload = JSON.stringify(routeShapePayload(), null, 2);
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(payload).then(function () {
-          setStatus("路线折线数据已复制。");
-          setDetail("把复制内容发给我，我可以固化进网页，之后别人打开就能看到预置蓝色路线。");
+          setStatus("路线 JSON 已复制。");
+          setDetail("更推荐使用“下载路线JSON”，把文件放到 data/route-shape.json，避免把大数据粘进对话。");
         }).catch(function () {
-          setStatus("复制失败，请稍后重试。");
+          setStatus("复制失败，请改用“下载路线JSON”。");
         });
       } else {
-        setStatus("当前浏览器不支持一键复制路线折线。");
+        setStatus("当前浏览器不支持一键复制，请改用“下载路线JSON”。");
       }
+    }
+
+    function downloadRouteShapeJson() {
+      if (!routeShape || routeShape.length < 2) {
+        setStatus("还没有可下载的路线 JSON。");
+        setDetail("先打开地图并点击“刷新实际车程”，等路线画出来后再下载。");
+        return;
+      }
+      var payload = JSON.stringify(routeShapePayload(), null, 2);
+      var blob = new Blob([payload], { type: "application/json;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement("a");
+      link.href = url;
+      link.download = "route-shape.json";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setStatus("路线 JSON 已生成下载。");
+      setDetail("把下载文件移动到本目录的 data/route-shape.json 后，页面会自动读取并绘制蓝色路线。");
     }
 
     function findLegByKey(key) {
@@ -780,8 +894,12 @@
 
     renderRouteLinks();
     renderPlaceList();
-    var savedKey = readCredential("dadaReaAmapKey");
-    var savedSecurity = readCredential("dadaReaAmapSecurity");
+    loadRouteShapeJson().then(function () {
+      if (activeAMap && map) drawStoredRouteLine(activeAMap);
+    });
+    var embeddedConfig = getEmbeddedAmapConfig();
+    var savedKey = readCredential("dadaReaAmapKey") || embeddedConfig.key;
+    var savedSecurity = readCredential("dadaReaAmapSecurity") || embeddedConfig.security;
     document.getElementById("amap-key").value = savedKey;
     document.getElementById("amap-security").value = savedSecurity;
     window.addEventListener("error", function (event) {
@@ -798,6 +916,9 @@
     if (savedKey && savedSecurity) {
       setStatus("正在自动打开互动地图...");
       loadAmap(savedKey, savedSecurity);
+    } else {
+      setStatus("地图授权没有配置。");
+      setDetail("请检查页面内置的高德 key 和安全码。");
     }
   </script>
 </body>

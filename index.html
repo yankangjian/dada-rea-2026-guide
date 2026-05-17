@@ -33,7 +33,7 @@
       align-items: end;
       background:
         linear-gradient(180deg, rgba(21, 38, 34, .08), rgba(21, 38, 34, .68)),
-        url("https://commons.wikimedia.org/wiki/Special:FilePath/%E8%B4%A1%E6%A0%BC%E5%B0%94%E8%8D%89%E5%8E%9F_-_Gongger_Grasslands_-_2011.06_-_panoramio.jpg?width=1800") center/cover;
+        url("https://commons.wikimedia.org/wiki/Special:FilePath/%E8%BE%BE%E9%87%8C%E8%AF%BA%E5%B0%94%E6%B9%96%E5%85%A8%E6%99%AF_-_Panorama_of_Dali_Nur_Lake_-_2011.06_-_panoramio.jpg?width=2200") center/cover;
       color: #fff;
       padding: 42px 22px;
     }
@@ -187,48 +187,6 @@
       display: grid;
       gap: 10px;
     }
-    .route-preview {
-      display: grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 16px;
-      align-items: stretch;
-    }
-    .route-map {
-      min-height: 320px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #eef3ef;
-      overflow: hidden;
-      position: relative;
-    }
-    .route-map svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-      min-height: 320px;
-    }
-    .route-map path {
-      fill: none;
-      stroke: var(--lake);
-      stroke-width: 4;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-    .route-map .preview-dot {
-      fill: var(--sun);
-      stroke: #fff;
-      stroke-width: 2;
-    }
-    .route-map-empty {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      padding: 18px;
-      text-align: center;
-      color: var(--muted);
-      background: repeating-linear-gradient(135deg, rgba(216,208,194,.28), rgba(216,208,194,.28) 12px, rgba(255,255,255,.22) 12px, rgba(255,255,255,.22) 24px);
-    }
     .route-step {
       display: flex;
       gap: 10px;
@@ -264,7 +222,7 @@
       section { margin: 26px 0; }
       .card { padding: 15px; }
       .lead { font-size: 16px; }
-      .cols-3, .cols-2, .photo-grid, .route-preview { grid-template-columns: 1fr; }
+      .cols-3, .cols-2, .photo-grid { grid-template-columns: 1fr; }
       .photo-grid { gap: 18px; }
       figure img {
         height: auto;
@@ -338,12 +296,12 @@
     <section>
       <div class="photo-grid">
         <figure>
-          <img alt="克什克腾草原公路" src="https://commons.wikimedia.org/wiki/Special:FilePath/%E8%8D%89%E5%8E%9F%E5%85%AC%E8%B7%AF_-_Grassland_Road_-_2011.06_-_panoramio.jpg?width=1400">
-          <figcaption>草原公路是这条线的主角，停车拍照比赶景点更值得。</figcaption>
+          <img alt="克什克腾草原公路" src="https://commons.wikimedia.org/wiki/Special:FilePath/%E7%BE%8E%E6%99%AF%E5%9C%A8%E8%B7%AF%E4%B8%8A_-_Grasslands_Road_-_2011.06_-_panoramio.jpg?width=1400">
+          <figcaption>草原公路本身就是主景，沿途慢开比赶景点更值得。</figcaption>
         </figure>
         <figure>
-          <img alt="阿斯哈图石林" src="https://commons.wikimedia.org/wiki/Special:FilePath/%E7%9F%B3%E6%9E%97%E8%BF%B7%E5%AE%AB_-_Granite_Pillars_Labyrinth_-_2011.06_-_panoramio.jpg?width=900">
-          <figcaption>阿斯哈图石林适合作为唯一“大景点”。</figcaption>
+          <img alt="阿斯哈图石林蓝天白云" src="https://commons.wikimedia.org/wiki/Special:FilePath/%E8%93%9D%E5%A4%A9%E7%99%BD%E4%BA%91%E4%B8%8B%E7%9A%84%E7%9F%B3%E6%9E%97_-_Granite_Forest_under_Blue_Sky_and_White_Clouds_-_2011.06_-_panoramio.jpg?width=900">
+          <figcaption>阿斯哈图石林适合作为全程唯一认真游览的“大景点”。</figcaption>
         </figure>
       </div>
     </section>
@@ -485,23 +443,6 @@
     </section>
 
     <section>
-      <h2>路线预览</h2>
-      <div class="route-preview">
-        <div class="route-map" id="route-preview-map">
-          <div class="route-map-empty" id="route-preview-empty">等待 data/route-shape.json 中的路线折线。</div>
-        </div>
-        <div class="card">
-          <h3>JSON 驱动的预置路线</h3>
-          <p>主攻略页只加载 <code>data/route-shape.json</code>，不再把上千个折线坐标写进 HTML。地图页刷新实际路线后下载同名 JSON，替换这个文件即可更新预览。</p>
-          <p class="note" id="route-preview-status">路线预览未加载。</p>
-          <div class="actions">
-            <a class="button secondary" href="map.html">打开地图刷新路线</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section>
       <h2>酒店规划</h2>
       <div class="grid cols-3">
         <div class="card">
@@ -630,7 +571,7 @@
         <li><a href="https://www.nmgs.org.cn/web/doc/d-1574.html">这里是草原：克什克腾石阵</a>：阿斯哈图石林位置、交通、门票和景区特征。</li>
         <li><a href="https://www.tianqi24.com/keshiketeng/history202506.html">天气24：克什克腾 2025 年 6 月历史天气</a>、<a href="https://chacha.zuzuche.com/weather/c2859_m6.html">租租车：克什克腾 6 月气候</a>：温度和降水参考。</li>
         <li><a href="https://www.spp.gov.cn/spp/dfjcdt/202601/t20260126_716842.shtml">最高人民检察院：达里湖华子鱼</a>：地方特色鱼类与品牌信息。</li>
-        <li>图片来自 Wikimedia Commons：Gongger Grasslands、Grassland Road、Granite Pillars Labyrinth，原作者 rheins / Panoramio，CC BY 3.0。</li>
+        <li>图片来自 Wikimedia Commons：Panorama of Dali Nur Lake、Grasslands Road、Granite Forest under Blue Sky and White Clouds，原作者 rheins / Panoramio，CC BY 3.0。</li>
       </ul>
       <p class="note">页面生成时间：2026-05-17。车次、门票、酒店、租车和路况属于可变信息，出发前请再次核验。</p>
     </section>
@@ -642,77 +583,5 @@
       <span>能 6/18 晚走就先到赤峰；6/19 赤峰租 SUV 到热水塘；6/20 慢走热阿线和达达线；6/21 从达里湖/经棚回赤峰坐高铁返京。</span>
     </div>
   </footer>
-  <script>
-    (function () {
-      var mapNode = document.getElementById("route-preview-map");
-      var emptyNode = document.getElementById("route-preview-empty");
-      var statusNode = document.getElementById("route-preview-status");
-      if (!mapNode || !statusNode) return;
-
-      function normalize(payload) {
-        if (Array.isArray(payload)) return payload;
-        if (payload && Array.isArray(payload.shape)) return payload.shape;
-        if (payload && Array.isArray(payload.routeShape)) return payload.routeShape;
-        return [];
-      }
-
-      function clean(points) {
-        return points.filter(function (point) {
-          return Array.isArray(point) &&
-            point.length >= 2 &&
-            typeof point[0] === "number" &&
-            typeof point[1] === "number" &&
-            isFinite(point[0]) &&
-            isFinite(point[1]);
-        });
-      }
-
-      function draw(points) {
-        var width = 900;
-        var height = 360;
-        var pad = 26;
-        var lngs = points.map(function (point) { return point[0]; });
-        var lats = points.map(function (point) { return point[1]; });
-        var minLng = Math.min.apply(null, lngs);
-        var maxLng = Math.max.apply(null, lngs);
-        var minLat = Math.min.apply(null, lats);
-        var maxLat = Math.max.apply(null, lats);
-        var lngRange = maxLng - minLng || 1;
-        var latRange = maxLat - minLat || 1;
-        var projected = points.map(function (point) {
-          return [
-            pad + ((point[0] - minLng) / lngRange) * (width - pad * 2),
-            height - pad - ((point[1] - minLat) / latRange) * (height - pad * 2)
-          ];
-        });
-        var path = projected.map(function (point, index) {
-          return (index ? "L" : "M") + point[0].toFixed(1) + " " + point[1].toFixed(1);
-        }).join(" ");
-        var first = projected[0];
-        var last = projected[projected.length - 1];
-        mapNode.innerHTML = '<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="达达线热阿线路线预览">' +
-          '<path d="' + path + '"></path>' +
-          '<circle class="preview-dot" cx="' + first[0].toFixed(1) + '" cy="' + first[1].toFixed(1) + '" r="7"></circle>' +
-          '<circle class="preview-dot" cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="7"></circle>' +
-          '</svg>';
-      }
-
-      fetch("data/route-shape.json", { cache: "no-store" }).then(function (response) {
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        return response.json();
-      }).then(function (payload) {
-        var points = clean(normalize(payload));
-        if (points.length < 2) {
-          statusNode.textContent = "路线 JSON 还没有写入折线点，当前显示占位图。";
-          return;
-        }
-        draw(points);
-        statusNode.textContent = "已从 data/route-shape.json 读取 " + points.length + " 个折线点。";
-      }).catch(function () {
-        if (emptyNode) emptyNode.textContent = "路线 JSON 未加载。请通过本地服务器或发布站点访问。";
-        statusNode.textContent = "路线 JSON 未加载。";
-      });
-    })();
-  </script>
 </body>
 </html>

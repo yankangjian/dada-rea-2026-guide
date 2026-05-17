@@ -292,13 +292,18 @@
       }
       window._AMapSecurityConfig = { securityJsCode: security };
       var script = document.createElement("script");
-      script.src = "https://webapi.amap.com/maps?v=2.0&key=" + encodeURIComponent(key) + "&plugin=AMap.Geocoder,AMap.Driving,AMap.Scale,AMap.ToolBar";
+      script.src = "https://webapi.amap.com/maps?v=2.0&key=" + encodeURIComponent(key);
       script.onload = initMap;
       script.onerror = function () {
         setStatus("高德地图脚本加载失败。请检查 Key、安全密钥、域名白名单和网络。");
       };
       document.head.appendChild(script);
       setStatus("正在加载高德地图...");
+      window.setTimeout(function () {
+        if (!window.AMap) {
+          setStatus("高德脚本超过 10 秒仍未就绪。通常是 Key、securityJsCode、域名白名单或网络问题。");
+        }
+      }, 10000);
     }
 
     function iconFor(place) {
@@ -308,20 +313,24 @@
     function initMap() {
       if (map) map.destroy();
       resolved = {};
-      map = new AMap.Map("map", {
-        zoom: 7.6,
-        center: [117.75, 43.25],
-        viewMode: "2D",
-        mapStyle: "amap://styles/normal"
-      });
-      map.addControl(new AMap.Scale());
-      map.addControl(new AMap.ToolBar({ position: { right: "16px", top: "16px" } }));
-      setStatus("正在定位地点并计算路线...");
-      geocodePlaces().then(function () {
-        addMarkers();
-        drawScenicPolyline();
-        drawDrivingRoute();
-        setStatus("高德地图已加载。路线为分段驾车规划，实际导航仍以出发当天为准。");
+      AMap.plugin(["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder", "AMap.Driving"], function () {
+        map = new AMap.Map("map", {
+          zoom: 7.6,
+          center: [117.75, 43.25],
+          viewMode: "2D",
+          mapStyle: "amap://styles/normal"
+        });
+        map.addControl(new AMap.Scale());
+        map.addControl(new AMap.ToolBar({ position: { right: "16px", top: "16px" } }));
+        setStatus("正在定位地点并计算路线...");
+        geocodePlaces().then(function () {
+          addMarkers();
+          drawScenicPolyline();
+          drawDrivingRoute();
+          setStatus("高德地图已加载。路线为分段驾车规划，实际导航仍以出发当天为准。");
+        }).catch(function () {
+          setStatus("地点解析失败。请先确认 Key 和安全密钥是否正确。");
+        });
       });
     }
 
@@ -418,6 +427,16 @@
     var savedSecurity = localStorage.getItem("dadaReaAmapSecurity") || "";
     document.getElementById("amap-key").value = savedKey;
     document.getElementById("amap-security").value = savedSecurity;
+    window.addEventListener("error", function (event) {
+      var message = event && event.message ? event.message : "未知脚本错误";
+      if (String(message).indexOf("AMap") !== -1 || String(message).indexOf("amap") !== -1) {
+        setStatus("高德脚本运行报错：" + message);
+      }
+    });
+    window.addEventListener("unhandledrejection", function (event) {
+      var reason = event && event.reason ? (event.reason.message || event.reason.toString()) : "未知 Promise 错误";
+      setStatus("高德地图初始化失败：" + reason);
+    });
     if (savedKey && savedSecurity) loadAmap(savedKey, savedSecurity);
   </script>
 </body>

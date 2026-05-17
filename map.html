@@ -188,11 +188,11 @@
     <div class="layout">
       <aside class="card">
         <h2>加载高德地图</h2>
-        <p>为了不公开你的高德凭据，Key 和安全密钥只保存在当前浏览器本地，不写入 GitHub Pages 源码。</p>
+        <p>Key 和安全密钥只保存在当前浏览器本地。同一台设备同一浏览器输入一次后，之后会自动加载。</p>
         <label for="amap-key">高德 Web端 JS API Key</label>
-        <input id="amap-key" autocomplete="off" placeholder="粘贴 Key">
+        <input id="amap-key" type="password" autocomplete="off" placeholder="粘贴 Key">
         <label for="amap-security">安全密钥 securityJsCode</label>
-        <input id="amap-security" autocomplete="off" placeholder="粘贴 securityJsCode">
+        <input id="amap-security" type="password" autocomplete="off" placeholder="粘贴 securityJsCode">
         <div class="actions">
           <button type="button" onclick="saveAndLoadMap()">加载地图</button>
           <button class="secondary" type="button" onclick="clearAmapKey()">清除本机保存</button>
@@ -279,18 +279,46 @@
         setDetail("");
         return;
       }
-      localStorage.setItem("dadaReaAmapKey", key);
-      localStorage.setItem("dadaReaAmapSecurity", security);
+      if (!saveCredentials(key, security)) return;
       loadAmap(key, security);
     }
 
     function clearAmapKey() {
-      localStorage.removeItem("dadaReaAmapKey");
-      localStorage.removeItem("dadaReaAmapSecurity");
+      removeCredential("dadaReaAmapKey");
+      removeCredential("dadaReaAmapSecurity");
       document.getElementById("amap-key").value = "";
       document.getElementById("amap-security").value = "";
       setStatus("已清除本机保存的高德 Key。");
       setDetail("如果刚刚加载失败，重新填写后再点“加载地图”。");
+    }
+
+    function saveCredentials(key, security) {
+      try {
+        localStorage.setItem("dadaReaAmapKey", key);
+        localStorage.setItem("dadaReaAmapSecurity", security);
+        setDetail("凭据已保存到当前浏览器。下次打开这个页面会自动加载地图。");
+        return true;
+      } catch (error) {
+        setStatus("浏览器没有保存高德凭据。");
+        setDetail("请检查是否使用了无痕模式、禁用了本地存储，或浏览器阻止了 GitHub Pages 的站点数据。");
+        return false;
+      }
+    }
+
+    function readCredential(name) {
+      try {
+        return localStorage.getItem(name) || "";
+      } catch (error) {
+        return "";
+      }
+    }
+
+    function removeCredential(name) {
+      try {
+        localStorage.removeItem(name);
+      } catch (error) {
+        return;
+      }
     }
 
     function loadAmap(key, security) {
@@ -481,8 +509,8 @@
     }
 
     renderPlaceList();
-    var savedKey = localStorage.getItem("dadaReaAmapKey") || "";
-    var savedSecurity = localStorage.getItem("dadaReaAmapSecurity") || "";
+    var savedKey = readCredential("dadaReaAmapKey");
+    var savedSecurity = readCredential("dadaReaAmapSecurity");
     document.getElementById("amap-key").value = savedKey;
     document.getElementById("amap-security").value = savedSecurity;
     window.addEventListener("error", function (event) {
@@ -496,7 +524,10 @@
       var reason = event && event.reason ? (event.reason.message || event.reason.toString()) : "未知 Promise 错误";
       setStatus("高德地图初始化失败：" + reason);
     });
-    if (savedKey && savedSecurity) loadAmap(savedKey, savedSecurity);
+    if (savedKey && savedSecurity) {
+      setStatus("检测到本机已保存高德凭据，正在自动加载地图...");
+      loadAmap(savedKey, savedSecurity);
+    }
   </script>
 </body>
 </html>

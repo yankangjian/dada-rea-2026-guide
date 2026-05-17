@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>真实地图与路线 - 达达线热阿线端午攻略</title>
+  <title>免 Key 地图与路线 - 达达线热阿线端午攻略</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIINfQ3T6JfXObM6Zl6d1b7R0pDypzrzp4A=" crossorigin="">
   <style>
     :root {
       --ink: #1f2933;
@@ -42,7 +44,7 @@
       gap: 10px;
       margin-top: 12px;
     }
-    .button, button {
+    .button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -53,10 +55,8 @@
       background: var(--lake);
       color: #fff;
       font-weight: 700;
-      cursor: pointer;
-      font: inherit;
     }
-    .button.secondary, button.secondary { background: #fff; color: var(--lake); }
+    .button.secondary { background: #fff; color: var(--lake); }
     .button:hover { text-decoration: none; filter: brightness(.98); }
     main { padding: 22px 0 54px; }
     .layout {
@@ -74,21 +74,11 @@
     }
     #map {
       width: 100%;
-      min-height: 680px;
+      min-height: 690px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #e8e4dc;
       overflow: hidden;
-    }
-    label { display: block; margin: 10px 0 5px; font-weight: 700; }
-    input {
-      width: 100%;
-      min-height: 40px;
-      padding: 8px 10px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      font: inherit;
-      background: #fff;
     }
     .note { color: var(--muted); font-size: 14px; }
     .legend {
@@ -121,36 +111,28 @@
       font-size: 13px;
       font-weight: 800;
       border: 2px solid #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+      box-shadow: 0 2px 8px rgba(0,0,0,.28);
       white-space: nowrap;
     }
     .scenic { background: var(--grass); }
     .hotel { background: var(--lake); }
     .food { background: var(--sun); }
     .transport { background: var(--stone); }
-    .route-list {
+    .route-list, .place-list {
       display: grid;
       gap: 8px;
       margin-top: 10px;
     }
-    .route-leg {
+    .route-leg, .place {
       padding: 10px;
       border: 1px solid #e5ded1;
       border-radius: 8px;
       background: #fbfcf8;
       font-size: 14px;
     }
-    .place-list {
-      display: grid;
-      gap: 8px;
-      margin-top: 10px;
-    }
     .place {
       display: grid;
       gap: 4px;
-      padding: 10px;
-      border: 1px solid #e5ded1;
-      border-radius: 8px;
       background: #fff;
     }
     .place strong { line-height: 1.3; }
@@ -174,7 +156,7 @@
       header { padding: 18px 0; }
       h1 { font-size: clamp(32px, 10vw, 44px); }
       .legend { grid-template-columns: 1fr; }
-      .button, button { width: 100%; }
+      .button { width: 100%; }
       #map { min-height: 58vh; }
     }
   </style>
@@ -182,9 +164,9 @@
 <body>
   <header>
     <div class="wrap">
-      <div>真实地图 · 高德 JS API</div>
+      <div>免 Key 地图 · OpenStreetMap + OSRM</div>
       <h1>达达线-热阿线行程地图</h1>
-      <p>包含交通节点、景区、酒店、餐厅和赤峰取还车环线路线。地图使用高德真实底图和驾车路线服务。</p>
+      <p>不需要高德 API Key。页面使用 OpenStreetMap 真实底图，尝试用 OSRM 免费路由画道路轨迹；失败时显示航点连线。</p>
       <div class="nav">
         <a class="button secondary" href="index.html">返回主攻略</a>
         <a class="button secondary" href="choices.html">酒店/餐厅 Top3</a>
@@ -195,17 +177,12 @@
   <main class="wrap">
     <div class="layout">
       <aside class="card">
-        <h2>加载高德地图</h2>
-        <p class="note">高德 Web JS API 需要你自己的 Key。Key 只保存在当前浏览器 localStorage，不写入网页源码。若想让所有分享者免填写，需要在高德控制台给 GitHub Pages 域名配置白名单后再把 Key 嵌入页面。</p>
-        <label for="amap-key">高德 Web 端 JS API Key</label>
-        <input id="amap-key" autocomplete="off" placeholder="例如 123abc...">
-        <label for="amap-security">安全密钥 securityJsCode</label>
-        <input id="amap-security" autocomplete="off" placeholder="高德控制台里对应的安全密钥">
+        <h2>地图说明</h2>
+        <p>这版不依赖付费或申请制地图 Key。底图来自 OpenStreetMap，路线来自 OSRM public demo server。</p>
+        <p class="note">国内偏远路段在 OSM 上可能没有高德完整，路线只用于行程理解；真正导航仍以高德/百度 App 当日路线为准。</p>
         <div class="actions">
-          <button type="button" onclick="saveAndLoad()">加载地图</button>
-          <button class="secondary" type="button" onclick="clearAmapKey()">清除 Key</button>
+          <a class="button" href="https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=42.2738%2C118.8959%3B43.4583%2C117.7250%3B43.9309%2C117.5352%3B43.5206%2C117.2095%3B43.4990%2C116.7096%3B43.2565%2C117.5351%3B42.2738%2C118.8959" target="_blank" rel="noreferrer">打开 OSM 路线</a>
         </div>
-        <p id="status" class="note">未加载地图。没有 Key 时，可先使用下方高德搜索链接核对地点。</p>
 
         <h2 style="margin-top:22px">图例</h2>
         <div class="legend">
@@ -217,7 +194,7 @@
 
         <h2 style="margin-top:22px">路线摘要</h2>
         <div id="route-summary" class="route-list">
-          <div class="route-leg">加载地图后会显示各段路线距离和预计时间。</div>
+          <div class="route-leg">正在计算路线...</div>
         </div>
       </aside>
 
@@ -225,7 +202,7 @@
         <div id="map"></div>
         <div class="card" style="margin-top:16px">
           <h2>地点清单</h2>
-          <p class="note">地图加载后，高德会按地点名称和地址实时定位。若某个点定位偏差，以高德搜索结果为准。</p>
+          <p class="note">坐标优先采用 OSM/Nominatim 可定位结果；热水塘坐标参考公开地理坐标描述；黄岗梁和部分餐厅为路线理解用近似点。</p>
           <div id="place-list" class="place-list"></div>
         </div>
       </section>
@@ -233,185 +210,133 @@
   </main>
 
   <footer>
-    <div class="wrap">提示：真实导航前仍以高德 App 当日路况、修路、限行和景区临时管制为准。</div>
+    <div class="wrap">提示：页面是公开分享版，不含任何个人 API Key。</div>
   </footer>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script>
     var places = [
-      { id: "beijing", name: "北京朝阳站", category: "transport", label: "京", query: "北京市朝阳区北京朝阳站" },
-      { id: "chifeng", name: "赤峰站", category: "transport", label: "赤", query: "内蒙古自治区赤峰市松山区赤峰站" },
-      { id: "reshui", name: "热水塘锦澜温泉酒店", category: "hotel", label: "宿", query: "赤峰市克什克腾旗热水塘镇锦澜温泉酒店" },
-      { id: "tianmu", name: "天牧温泉接待中心", category: "hotel", label: "宿", query: "赤峰市克什克腾旗热水塘镇天牧温泉接待中心" },
-      { id: "jingpeng-hotel", name: "尚客优酒店克什克腾旗政府旅游商贸广场店", category: "hotel", label: "宿", query: "赤峰市克什克腾旗经棚镇尚客优酒店克什克腾旗政府旅游商贸广场店" },
-      { id: "starway", name: "星程酒店赤峰站东广场店", category: "hotel", label: "宿", query: "赤峰市松山区星程酒店赤峰站东广场店" },
-      { id: "huanggangliang", name: "黄岗梁国家森林公园", category: "scenic", label: "景", query: "赤峰市克什克腾旗黄岗梁国家森林公园" },
-      { id: "ashatu", name: "阿斯哈图石林景区", category: "scenic", label: "景", query: "赤峰市克什克腾旗阿斯哈图石林景区" },
-      { id: "baiyin", name: "白音敖包沙地云杉景区", category: "scenic", label: "景", query: "赤峰市克什克腾旗白音敖包沙地云杉景区" },
-      { id: "gongger", name: "贡格尔草原", category: "scenic", label: "景", query: "赤峰市克什克腾旗贡格尔草原" },
-      { id: "dali", name: "达里湖景区", category: "scenic", label: "湖", query: "赤峰市克什克腾旗达里湖景区" },
-      { id: "bayin-food", name: "巴音杭盖蒙餐", category: "food", label: "食", query: "赤峰市克什克腾旗经棚镇贡格尔街巴音杭盖蒙餐" },
-      { id: "north-food", name: "达里湖北岸人家蒙餐厅", category: "food", label: "食", query: "赤峰市克什克腾旗达里湖渔场30号北岸人家蒙餐厅" },
-      { id: "fish-food", name: "达里湖鱼宴城", category: "food", label: "食", query: "赤峰市克什克腾旗达里湖渔场达里湖鱼宴城" }
+      { id: "beijing", name: "北京朝阳站", category: "transport", label: "京", lat: 39.9431265, lon: 116.5020402, note: "高铁出发点" },
+      { id: "chifeng", name: "赤峰站", category: "transport", label: "赤", lat: 42.2738113, lon: 118.8958844, note: "取还车/高铁换乘" },
+      { id: "starway", name: "星程酒店赤峰站东广场店", category: "hotel", label: "宿", lat: 42.2748, lon: 118.9020, note: "6/18 前置晚候选" },
+      { id: "reshui", name: "热水塘温泉住宿区", category: "hotel", label: "宿", lat: 43.4583, lon: 117.7250, note: "热水塘锦澜/天牧一带" },
+      { id: "huanggangliang", name: "黄岗梁森林草原路段", category: "scenic", label: "景", lat: 43.6750, lon: 117.6100, note: "热阿线山地森林段近似点" },
+      { id: "ashatu", name: "阿斯哈图石林", category: "scenic", label: "景", lat: 43.9309106, lon: 117.5351638, note: "OSM 可定位景区点" },
+      { id: "baiyin", name: "白音敖包景区", category: "scenic", label: "景", lat: 43.5206038, lon: 117.2095192, note: "沙地云杉景区" },
+      { id: "gongger", name: "贡格尔草原", category: "scenic", label: "景", lat: 43.3500, lon: 117.0500, note: "达达线草原路段近似点" },
+      { id: "dali", name: "达里湖北岸/达达线终点区", category: "scenic", label: "湖", lat: 43.4989508, lon: 116.7096399, note: "OSM 达里湖附近点" },
+      { id: "jingpeng-hotel", name: "经棚镇住宿区", category: "hotel", label: "宿", lat: 43.2565023, lon: 117.5350821, note: "尚客优/经棚镇补给区" },
+      { id: "bayin-food", name: "巴音杭盖蒙餐", category: "food", label: "食", lat: 43.2569, lon: 117.5360, note: "经棚镇蒙餐候选" },
+      { id: "north-food", name: "达里湖北岸人家蒙餐厅", category: "food", label: "食", lat: 43.5000, lon: 116.7130, note: "达里湖北岸餐饮候选" },
+      { id: "fish-food", name: "达里湖鱼宴城", category: "food", label: "食", lat: 43.4965, lon: 116.7080, note: "华子鱼候选" }
     ];
 
-    var routeIds = ["chifeng", "reshui", "huanggangliang", "ashatu", "baiyin", "dali", "jingpeng-hotel", "chifeng"];
-    var map;
-    var resolved = {};
+    var routeIds = ["chifeng", "reshui", "huanggangliang", "ashatu", "baiyin", "gongger", "dali", "jingpeng-hotel", "chifeng"];
+    var routePlaces = routeIds.map(function (id) {
+      return places.find(function (place) { return place.id === id; });
+    }).filter(Boolean);
 
-    function amapSearchUrl(place) {
-      return "https://uri.amap.com/search?keyword=" + encodeURIComponent(place.query) + "&city=赤峰&src=dada-rea-guide&coordinate=gaode&callnative=0";
+    var map = L.map("map", { scrollWheelZoom: true });
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    function colorFor(category) {
+      return {
+        scenic: "#436b4f",
+        hotel: "#286c7c",
+        food: "#b85c38",
+        transport: "#73706a"
+      }[category] || "#286c7c";
     }
+
+    function markerIcon(place) {
+      return L.divIcon({
+        className: "",
+        html: '<div class="pin ' + place.category + '">' + place.label + '</div>',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        popupAnchor: [0, -16]
+      });
+    }
+
+    var bounds = [];
+    places.forEach(function (place) {
+      var latlng = [place.lat, place.lon];
+      bounds.push(latlng);
+      L.marker(latlng, { icon: markerIcon(place), title: place.name })
+        .bindPopup("<strong>" + place.name + "</strong><br>" + place.note + "<br><span class='note'>" + place.lat.toFixed(4) + ", " + place.lon.toFixed(4) + "</span>")
+        .addTo(map);
+    });
+    map.fitBounds(bounds, { padding: [30, 30] });
+
+    L.polyline(routePlaces.map(function (place) { return [place.lat, place.lon]; }), {
+      color: "#b85c38",
+      weight: 3,
+      dashArray: "6 8",
+      opacity: 0.7
+    }).addTo(map).bindPopup("OSRM 路由失败时的航点连接线");
+
+    var scenicLine = L.polyline([
+      [43.4583, 117.7250],
+      [43.6750, 117.6100],
+      [43.9309106, 117.5351638],
+      [43.5206038, 117.2095192],
+      [43.3500, 117.0500],
+      [43.4989508, 116.7096399]
+    ], {
+      color: "#436b4f",
+      weight: 5,
+      opacity: 0.55
+    }).addTo(map).bindPopup("热阿线 + 达达线核心观景段");
 
     function renderPlaceList() {
       var list = document.getElementById("place-list");
       list.innerHTML = places.map(function (place) {
-        return '<div class="place"><strong>' + place.name + '</strong><span class="note">' + place.query + '</span><a href="' + amapSearchUrl(place) + '" target="_blank" rel="noreferrer">在高德中查看</a></div>';
+        return '<div class="place"><strong>' + place.name + '</strong><span>' + place.note + '</span><span class="note">' + place.lat.toFixed(5) + ', ' + place.lon.toFixed(5) + '</span></div>';
       }).join("");
     }
 
-    function saveAndLoad() {
-      var key = document.getElementById("amap-key").value.trim();
-      var security = document.getElementById("amap-security").value.trim();
-      if (!key || !security) {
-        setStatus("请先填写高德 JS API Key 和 securityJsCode。");
-        return;
-      }
-      localStorage.setItem("dadaReaAmapKey", key);
-      localStorage.setItem("dadaReaAmapSecurity", security);
-      loadAmap(key, security);
+    function renderFallbackSummary() {
+      var summary = document.getElementById("route-summary");
+      summary.innerHTML = routePlaces.slice(0, -1).map(function (place, index) {
+        return '<div class="route-leg">' + (index + 1) + ". " + place.name + " → " + routePlaces[index + 1].name + '</div>';
+      }).join("");
     }
 
-    function clearAmapKey() {
-      localStorage.removeItem("dadaReaAmapKey");
-      localStorage.removeItem("dadaReaAmapSecurity");
-      document.getElementById("amap-key").value = "";
-      document.getElementById("amap-security").value = "";
-      setStatus("已清除本机保存的高德 Key。");
-    }
-
-    function setStatus(text) {
-      document.getElementById("status").textContent = text;
-    }
-
-    function loadAmap(key, security) {
-      if (window.AMap) {
-        initMap();
-        return;
-      }
-      window._AMapSecurityConfig = { securityJsCode: security };
-      var script = document.createElement("script");
-      script.src = "https://webapi.amap.com/maps?v=2.0&key=" + encodeURIComponent(key) + "&plugin=AMap.Geocoder,AMap.Driving,AMap.Scale,AMap.ToolBar";
-      script.onload = initMap;
-      script.onerror = function () {
-        setStatus("高德地图脚本加载失败。请检查 Key、安全密钥、域名白名单和网络。");
-      };
-      document.head.appendChild(script);
-      setStatus("正在加载高德地图...");
-    }
-
-    function initMap() {
-      map = new AMap.Map("map", {
-        zoom: 8,
-        center: [117.75, 43.35],
-        viewMode: "2D"
-      });
-      map.addControl(new AMap.Scale());
-      map.addControl(new AMap.ToolBar({ position: { right: "16px", top: "16px" } }));
-      setStatus("正在定位地点并绘制路线...");
-      geocodePlaces().then(function () {
-        addMarkers();
-        drawRoute();
-        setStatus("地图已加载。路线为高德驾车路径规划结果，实际导航以出发当天为准。");
-      }).catch(function (error) {
-        setStatus("地图加载失败：" + error.message);
-      });
-    }
-
-    function geocodePlaces() {
-      return new Promise(function (resolve, reject) {
-        AMap.plugin("AMap.Geocoder", function () {
-          var geocoder = new AMap.Geocoder({ city: "赤峰" });
-          var pending = places.map(function (place) {
-            return new Promise(function (done) {
-              geocoder.getLocation(place.query, function (status, result) {
-                if (status === "complete" && result.geocodes && result.geocodes.length) {
-                  resolved[place.id] = result.geocodes[0].location;
-                  done();
-                } else {
-                  console.warn("Geocode failed", place.name, result);
-                  done();
-                }
-              });
-            });
-          });
-          Promise.all(pending).then(resolve).catch(reject);
+    function drawOsrmRoute() {
+      var coords = routePlaces.map(function (place) {
+        return place.lon + "," + place.lat;
+      }).join(";");
+      var url = "https://router.project-osrm.org/route/v1/driving/" + coords + "?overview=full&geometries=geojson&steps=false";
+      fetch(url).then(function (response) {
+        if (!response.ok) throw new Error("OSRM HTTP " + response.status);
+        return response.json();
+      }).then(function (data) {
+        if (!data.routes || !data.routes.length) throw new Error("OSRM 没有返回路线");
+        var route = data.routes[0];
+        var latlngs = route.geometry.coordinates.map(function (coord) {
+          return [coord[1], coord[0]];
         });
-      });
-    }
-
-    function addMarkers() {
-      var bounds = [];
-      places.forEach(function (place) {
-        var point = resolved[place.id];
-        if (!point) return;
-        bounds.push(point);
-        var marker = new AMap.Marker({
-          position: point,
-          title: place.name,
-          content: '<div class="pin ' + place.category + '">' + place.label + '</div>',
-          offset: new AMap.Pixel(-15, -15)
-        });
-        marker.setMap(map);
-        marker.on("click", function () {
-          new AMap.InfoWindow({
-            content: '<strong>' + place.name + '</strong><br><span>' + place.query + '</span><br><a target="_blank" rel="noreferrer" href="' + amapSearchUrl(place) + '">在高德中查看</a>',
-            offset: new AMap.Pixel(0, -18)
-          }).open(map, point);
-        });
-      });
-      if (bounds.length) map.setFitView(null, false, [70, 40, 70, 40]);
-    }
-
-    function drawRoute() {
-      AMap.plugin("AMap.Driving", function () {
+        L.polyline(latlngs, {
+          color: "#286c7c",
+          weight: 5,
+          opacity: 0.88
+        }).addTo(map).bindPopup("OSRM 计算的驾车路线");
+        map.fitBounds(latlngs, { padding: [30, 30] });
         var summary = document.getElementById("route-summary");
-        summary.innerHTML = "";
-        var legs = [];
-        for (var i = 0; i < routeIds.length - 1; i += 1) {
-          var from = places.find(function (p) { return p.id === routeIds[i]; });
-          var to = places.find(function (p) { return p.id === routeIds[i + 1]; });
-          if (from && to && resolved[from.id] && resolved[to.id]) legs.push([from, to]);
-        }
-        legs.forEach(function (leg, index) {
-          var driving = new AMap.Driving({
-            map: map,
-            showTraffic: false,
-            hideMarkers: true,
-            policy: AMap.DrivingPolicy.LEAST_TIME
-          });
-          driving.search(resolved[leg[0].id], resolved[leg[1].id], function (status, result) {
-            var text = (index + 1) + ". " + leg[0].name + " → " + leg[1].name;
-            if (status === "complete" && result.routes && result.routes.length) {
-              var route = result.routes[0];
-              text += " · " + Math.round(route.distance / 1000) + " km · 约 " + Math.round(route.time / 60) + " 分钟";
-            } else {
-              text += " · 路线计算失败，建议跳转高德 App 核对";
-            }
-            var div = document.createElement("div");
-            div.className = "route-leg";
-            div.textContent = text;
-            summary.appendChild(div);
-          });
-        });
+        summary.innerHTML = '<div class="route-leg">OSRM 路线总计：约 ' + Math.round(route.distance / 1000) + ' km，纯驾驶约 ' + Math.round(route.duration / 3600 * 10) / 10 + ' 小时。偏远路段仍需用高德 App 复核。</div>';
+      }).catch(function (error) {
+        console.warn(error);
+        renderFallbackSummary();
       });
     }
 
     renderPlaceList();
-    var savedKey = localStorage.getItem("dadaReaAmapKey") || "";
-    var savedSecurity = localStorage.getItem("dadaReaAmapSecurity") || "";
-    document.getElementById("amap-key").value = savedKey;
-    document.getElementById("amap-security").value = savedSecurity;
-    if (savedKey && savedSecurity) loadAmap(savedKey, savedSecurity);
+    renderFallbackSummary();
+    drawOsrmRoute();
   </script>
 </body>
 </html>

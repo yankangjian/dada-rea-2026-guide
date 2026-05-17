@@ -110,19 +110,20 @@
       display: inline-block;
     }
     .pin {
-      min-width: 30px;
-      height: 30px;
-      padding: 0 8px;
+      min-width: 54px;
+      height: 32px;
+      padding: 0 9px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       border-radius: 999px;
       color: #fff;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
       border: 2px solid #fff;
       box-shadow: 0 2px 8px rgba(0,0,0,.28);
       white-space: nowrap;
+      letter-spacing: 0;
     }
     .scenic { background: var(--grass); }
     .hotel { background: var(--lake); }
@@ -253,19 +254,19 @@
 
   <script>
     var places = [
-      { id: "beijing", name: "北京朝阳站", category: "transport", label: "京", query: "北京市朝阳区北京朝阳站", fallback: [116.5020402, 39.9431265], note: "高铁出发点" },
-      { id: "chifeng", name: "赤峰站", category: "transport", label: "赤", query: "内蒙古自治区赤峰市松山区赤峰站", fallback: [118.8958844, 42.2738113], note: "取还车/高铁换乘" },
-      { id: "starway", name: "星程酒店赤峰站东广场店", category: "hotel", label: "宿", query: "赤峰市松山区星程酒店赤峰站东广场店", fallback: [118.9020, 42.2748], note: "6/18 前置晚候选" },
-      { id: "reshui", name: "热水塘温泉住宿区", category: "hotel", label: "宿", query: "赤峰市克什克腾旗热水塘镇锦澜温泉酒店", fallback: [117.7250, 43.4583], note: "热水塘锦澜/天牧一带" },
-      { id: "huanggangliang", name: "黄岗梁森林草原路段", category: "scenic", label: "景", query: "赤峰市克什克腾旗黄岗梁国家森林公园", fallback: [117.6100, 43.6750], note: "热阿线山地森林段近似点" },
-      { id: "ashatu", name: "阿斯哈图石林", category: "scenic", label: "景", query: "赤峰市克什克腾旗阿斯哈图石林景区", fallback: [117.5351638, 43.9309106], note: "唯一大景点候选" },
-      { id: "baiyin", name: "白音敖包景区", category: "scenic", label: "景", query: "赤峰市克什克腾旗白音敖包沙地云杉景区", fallback: [117.2095192, 43.5206038], note: "沙地云杉景区" },
-      { id: "gongger", name: "贡格尔草原", category: "scenic", label: "景", query: "赤峰市克什克腾旗贡格尔草原", fallback: [117.0500, 43.3500], note: "达达线草原路段近似点" },
-      { id: "dali", name: "达里湖景区", category: "scenic", label: "湖", query: "赤峰市克什克腾旗达里湖景区", fallback: [116.7096399, 43.4989508], note: "日落与湖边餐饮区域" },
-      { id: "jingpeng-hotel", name: "经棚镇住宿区", category: "hotel", label: "宿", query: "赤峰市克什克腾旗经棚镇尚客优酒店克什克腾旗政府旅游商贸广场店", fallback: [117.5350821, 43.2565023], note: "尚客优/经棚镇补给区" },
-      { id: "bayin-food", name: "巴音杭盖蒙餐", category: "food", label: "食", query: "赤峰市克什克腾旗经棚镇贡格尔街巴音杭盖蒙餐", fallback: [117.5360, 43.2569], note: "经棚镇蒙餐候选" },
-      { id: "north-food", name: "达里湖北岸人家蒙餐厅", category: "food", label: "食", query: "赤峰市克什克腾旗达里湖渔场30号北岸人家蒙餐厅", fallback: [116.7130, 43.5000], note: "达里湖北岸餐饮候选" },
-      { id: "fish-food", name: "达里湖鱼宴城", category: "food", label: "食", query: "赤峰市克什克腾旗达里湖渔场达里湖鱼宴城", fallback: [116.7080, 43.4965], note: "华子鱼候选" }
+      { id: "beijing", name: "北京朝阳站", category: "transport", label: "6/18行", query: "北京市朝阳区北京朝阳站", fallback: [116.5020402, 39.9431265], note: "高铁出发点" },
+      { id: "chifeng", name: "赤峰站", category: "transport", label: "6/19行", query: "内蒙古自治区赤峰市松山区赤峰站", fallback: [118.8958844, 42.2738113], note: "取还车/高铁换乘；6/21 回到赤峰还车返京" },
+      { id: "starway", name: "星程酒店赤峰站东广场店", category: "hotel", label: "6/18宿", query: "赤峰市松山区星程酒店赤峰站东广场店", fallback: [118.9020, 42.2748], note: "6/18 前置晚候选" },
+      { id: "reshui", name: "热水塘温泉住宿区", category: "hotel", label: "6/19宿", query: "赤峰市克什克腾旗热水塘镇锦澜温泉酒店", fallback: [117.7250, 43.4583], note: "热水塘锦澜/天牧一带" },
+      { id: "huanggangliang", name: "黄岗梁森林草原路段", category: "scenic", label: "6/20景", query: "赤峰市克什克腾旗黄岗梁国家森林公园", fallback: [117.6100, 43.6750], note: "热阿线山地森林段近似点" },
+      { id: "ashatu", name: "阿斯哈图石林", category: "scenic", label: "6/20景", query: "赤峰市克什克腾旗阿斯哈图石林景区", fallback: [117.5351638, 43.9309106], note: "唯一大景点候选" },
+      { id: "baiyin", name: "白音敖包景区", category: "scenic", label: "6/20景", query: "赤峰市克什克腾旗白音敖包沙地云杉景区", fallback: [117.2095192, 43.5206038], note: "沙地云杉景区" },
+      { id: "gongger", name: "贡格尔草原", category: "scenic", label: "6/20景", query: "赤峰市克什克腾旗贡格尔草原", fallback: [117.0500, 43.3500], note: "达达线草原路段近似点" },
+      { id: "dali", name: "达里湖景区", category: "scenic", label: "6/20景", query: "赤峰市克什克腾旗达里湖景区", fallback: [116.7096399, 43.4989508], note: "日落与湖边餐饮区域" },
+      { id: "jingpeng-hotel", name: "经棚镇住宿区", category: "hotel", label: "6/20宿", query: "赤峰市克什克腾旗经棚镇尚客优酒店克什克腾旗政府旅游商贸广场店", fallback: [117.5350821, 43.2565023], note: "尚客优/经棚镇补给区" },
+      { id: "bayin-food", name: "巴音杭盖蒙餐", category: "food", label: "6/20食", query: "赤峰市克什克腾旗经棚镇贡格尔街巴音杭盖蒙餐", fallback: [117.5360, 43.2569], note: "经棚镇蒙餐候选" },
+      { id: "north-food", name: "达里湖北岸人家蒙餐厅", category: "food", label: "6/20食", query: "赤峰市克什克腾旗达里湖渔场30号北岸人家蒙餐厅", fallback: [116.7130, 43.5000], note: "达里湖北岸餐饮候选" },
+      { id: "fish-food", name: "达里湖鱼宴城", category: "food", label: "6/20食", query: "赤峰市克什克腾旗达里湖渔场达里湖鱼宴城", fallback: [116.7080, 43.4965], note: "华子鱼候选" }
     ];
 
     var routeIds = ["chifeng", "reshui", "huanggangliang", "ashatu", "baiyin", "gongger", "dali", "jingpeng-hotel", "chifeng"];

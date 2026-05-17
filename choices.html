@@ -116,9 +116,26 @@
     tr:last-child td { border-bottom: 0; }
     footer { background: #273036; color: #dce4e2; padding: 24px 0; }
     @media (max-width: 860px) {
+      body { line-height: 1.55; }
+      header {
+        min-height: 38vh;
+        padding: 30px 16px 26px;
+      }
+      .wrap { width: min(100% - 28px, 1100px); }
+      h1 { font-size: clamp(34px, 10vw, 50px); }
+      h2 { font-size: 23px; }
+      h3 { font-size: 18px; }
+      main { padding: 22px 0 calc(96px + env(safe-area-inset-bottom)); }
+      section { margin: 26px 0; }
+      .card { padding: 15px; }
       .cards, .split { grid-template-columns: 1fr; }
       table { font-size: 14px; }
       th, td { padding: 10px; }
+      footer { padding-bottom: calc(26px + env(safe-area-inset-bottom)); }
+    }
+    @media (max-width: 480px) {
+      .wrap { width: min(100% - 24px, 1100px); }
+      .tag { white-space: normal; }
     }
   </style>
 </head>

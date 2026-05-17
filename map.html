@@ -217,6 +217,7 @@
           <button type="button" onclick="saveAndLoadMap()">打开地图</button>
           <button class="secondary" type="button" onclick="calculateDrivingRoutes()">刷新实际车程</button>
           <button class="secondary" type="button" onclick="copyRouteResults()">复制实际车程结果</button>
+          <button class="secondary" type="button" onclick="copyRouteShape()">复制路线折线数据</button>
           <a class="button" href="https://uri.amap.com/navigation?from=118.895884,42.273811,%E8%B5%A4%E5%B3%B0%E7%AB%99&to=117.535164,43.930911,%E9%98%BF%E6%96%AF%E5%93%88%E5%9B%BE%E7%9F%B3%E6%9E%97&mode=car&policy=1&src=dada-rea-guide&coordinate=gaode&callnative=0" target="_blank" rel="noreferrer">打开高德导航示例</a>
         </div>
         <p id="load-status" class="note">地图打开后会显示点位、行程线和路线摘要。</p>
@@ -292,6 +293,7 @@
     var loaderPromise;
     var activeAMap;
     var drivingRouteStarted = false;
+    var routeShape = readRouteShape();
 
     function setStatus(message) {
       document.getElementById("load-status").textContent = message;
@@ -486,7 +488,7 @@
       setDetail("");
       resolveFallbackPlaces(AMap).then(function () {
         addMarkers(AMap);
-        drawScenicPolyline(AMap);
+        drawStoredRouteLine(AMap);
         renderRouteLinks();
         setStatus("地图已打开。点位、行程线和路线摘要已就绪。");
         setDetail("需要更接近实时路况的公里数和车程时，点击“刷新实际车程”。");
@@ -542,6 +544,23 @@
       }).setMap(map);
     }
 
+    function drawStoredRouteLine(AMap) {
+      if (routeShape && routeShape.length > 1) {
+        new AMap.Polyline({
+          path: routeShape.map(function (point) { return new AMap.LngLat(point[0], point[1]); }),
+          strokeColor: "#1296db",
+          strokeWeight: 7,
+          strokeOpacity: 0.9,
+          strokeStyle: "solid",
+          lineJoin: "round",
+          lineCap: "round",
+          zIndex: 35
+        }).setMap(map);
+        return;
+      }
+      drawScenicPolyline(AMap);
+    }
+
     function renderRouteLinks() {
       var summary = document.getElementById("route-summary");
       summary.innerHTML = "";
@@ -582,6 +601,22 @@
     function saveRouteResults() {
       try {
         localStorage.setItem("dadaReaRouteResults", JSON.stringify(routeResults));
+      } catch (error) {
+        return;
+      }
+    }
+
+    function readRouteShape() {
+      try {
+        return JSON.parse(localStorage.getItem("dadaReaRouteShape") || "[]");
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveRouteShape() {
+      try {
+        localStorage.setItem("dadaReaRouteShape", JSON.stringify(routeShape));
       } catch (error) {
         return;
       }
@@ -647,7 +682,9 @@
               updatedAt: new Date().toLocaleString("zh-CN", { hour12: false })
             };
             routeResults[routeKey(leg[0], leg[1])] = refreshed;
+            appendRouteShape(route);
             saveRouteResults();
+            saveRouteShape();
             text += " · " + refreshed.distance + " · " + refreshed.duration;
           } else {
             var estimate = routeEstimates[leg[0].id + "-" + leg[1].id] || { distance: "约 -- km", duration: "约 --" };
@@ -661,6 +698,23 @@
           calculateRouteLegs(AMap, legs, index + 1);
         });
       }, index === 0 ? 0 : 1200);
+    }
+
+    function appendRouteShape(route) {
+      if (!route || !route.steps) return;
+      route.steps.forEach(function (step) {
+        var path = step.path || [];
+        path.forEach(function (point) {
+          if (!point) return;
+          var lng = typeof point.getLng === "function" ? point.getLng() : point.lng;
+          var lat = typeof point.getLat === "function" ? point.getLat() : point.lat;
+          if (typeof lng !== "number" || typeof lat !== "number") return;
+          var last = routeShape[routeShape.length - 1];
+          if (!last || Math.abs(last[0] - lng) > 0.000001 || Math.abs(last[1] - lat) > 0.000001) {
+            routeShape.push([Number(lng.toFixed(6)), Number(lat.toFixed(6))]);
+          }
+        });
+      });
     }
 
     function copyRouteResults() {
@@ -693,6 +747,25 @@
         });
       } else {
         setStatus("当前浏览器不支持一键复制，请手动复制路线摘要。");
+      }
+    }
+
+    function copyRouteShape() {
+      if (!routeShape || routeShape.length < 2) {
+        setStatus("还没有可复制的路线折线。");
+        setDetail("先打开地图并点击“刷新实际车程”，等路线画出来后再复制。");
+        return;
+      }
+      var payload = JSON.stringify(routeShape);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(payload).then(function () {
+          setStatus("路线折线数据已复制。");
+          setDetail("把复制内容发给我，我可以固化进网页，之后别人打开就能看到预置蓝色路线。");
+        }).catch(function () {
+          setStatus("复制失败，请稍后重试。");
+        });
+      } else {
+        setStatus("当前浏览器不支持一键复制路线折线。");
       }
     }
 

@@ -206,8 +206,8 @@
   <main class="wrap">
     <div class="layout">
       <aside class="card">
-        <h2>路线与车程</h2>
-        <p class="note">先按行程估算展示；点击“刷新实际车程”后，会用高德路线结果更新每段公里数和时间。</p>
+        <h2>推荐时间表</h2>
+        <p class="note">把每天的建议时间、行车段和地图导航放在一起看。默认先显示行程估算，点击“刷新实际车程”后会更新为当前路线结果。</p>
         <div id="route-summary" class="route-list">
           <div class="route-leg">地图加载后会显示分段路线。</div>
         </div>
@@ -216,6 +216,7 @@
         <div class="actions">
           <button type="button" onclick="saveAndLoadMap()">打开地图</button>
           <button class="secondary" type="button" onclick="calculateDrivingRoutes()">刷新实际车程</button>
+          <button class="secondary" type="button" onclick="copyRouteResults()">复制实际车程结果</button>
           <a class="button" href="https://uri.amap.com/navigation?from=118.895884,42.273811,%E8%B5%A4%E5%B3%B0%E7%AB%99&to=117.535164,43.930911,%E9%98%BF%E6%96%AF%E5%93%88%E5%9B%BE%E7%9F%B3%E6%9E%97&mode=car&policy=1&src=dada-rea-guide&coordinate=gaode&callnative=0" target="_blank" rel="noreferrer">打开高德导航示例</a>
         </div>
         <p id="load-status" class="note">地图打开后会显示点位、行程线和路线摘要。</p>
@@ -223,8 +224,8 @@
         <details style="margin-top:12px">
           <summary>地图授权设置</summary>
           <p class="note">同一台设备同一浏览器输入一次即可保存，之后会自动打开地图。</p>
-          <label for="amap-key">地图授权 Key</label>
-          <input id="amap-key" type="password" autocomplete="off" placeholder="粘贴 Key">
+          <label for="amap-key">地图授权码</label>
+          <input id="amap-key" type="password" autocomplete="off" placeholder="粘贴授权码">
           <label for="amap-security">安全码</label>
           <input id="amap-security" type="password" autocomplete="off" placeholder="粘贴安全码">
           <div class="actions">
@@ -276,15 +277,16 @@
 
     var routeIds = ["chifeng", "reshui", "huanggangliang", "ashatu", "baiyin", "gongger", "dali", "jingpeng-hotel", "chifeng"];
     var routeEstimates = {
-      "chifeng-reshui": { distance: "约 215 km", duration: "约 3 小时", note: "6/19 下午主行车段" },
-      "reshui-huanggangliang": { distance: "约 55 km", duration: "约 1.5 小时", note: "6/20 热阿线森林草原段" },
-      "huanggangliang-ashatu": { distance: "约 65 km", duration: "约 1.5 小时", note: "山路多，按慢速拍照节奏" },
-      "ashatu-baiyin": { distance: "约 90 km", duration: "约 2 小时", note: "从石林转入达达线方向" },
-      "baiyin-gongger": { distance: "约 35 km", duration: "约 45 分钟", note: "草原路段，适合慢开" },
-      "gongger-dali": { distance: "约 60 km", duration: "约 1.2 小时", note: "达里湖日落方向" },
-      "dali-jingpeng-hotel": { distance: "约 85 km", duration: "约 1.5 小时", note: "看日落后不建议太晚出发" },
-      "jingpeng-hotel-chifeng": { distance: "约 250 km", duration: "约 3.5 小时", note: "6/21 返程还车段" }
+      "chifeng-reshui": { day: "6/19", time: "14:30-17:30", distance: "约 215 km", duration: "约 3 小时", note: "赤峰取车后直奔热水塘，晚上泡温泉休整" },
+      "reshui-huanggangliang": { day: "6/20", time: "09:30-11:00", distance: "约 55 km", duration: "约 1.5 小时", note: "热阿线森林草原段，慢开找安全停车点" },
+      "huanggangliang-ashatu": { day: "6/20", time: "11:20-13:00", distance: "约 65 km", duration: "约 1.5 小时", note: "山路多，预留拍照和午餐弹性" },
+      "ashatu-baiyin": { day: "6/20", time: "15:00-17:00", distance: "约 90 km", duration: "约 2 小时", note: "石林游玩后转向达达线，不建议太晚出发" },
+      "baiyin-gongger": { day: "6/20", time: "17:00-17:45", distance: "约 35 km", duration: "约 45 分钟", note: "草原路段，适合慢开和短停" },
+      "gongger-dali": { day: "6/20", time: "17:45-19:00", distance: "约 60 km", duration: "约 1.2 小时", note: "往达里湖日落方向，视天气决定是否停留" },
+      "dali-jingpeng-hotel": { day: "6/20", time: "19:30-21:00", distance: "约 85 km", duration: "约 1.5 小时", note: "如果看完日落再回经棚，不要拖到太晚" },
+      "jingpeng-hotel-chifeng": { day: "6/21", time: "09:30-13:00", distance: "约 250 km", duration: "约 3.5 小时", note: "返程还车段，给高铁留足缓冲" }
     };
+    var routeResults = readRouteResults();
     var map;
     var resolved = {};
     var loaderPromise;
@@ -409,7 +411,7 @@
         initMap(AMapInstance);
       }).catch(function (error) {
         setStatus("互动地图暂时没有打开。");
-        setDetail("请检查高德控制台里这个授权是否允许 yankangjian.github.io 域名访问。");
+        setDetail("请检查地图授权设置是否允许这个网页访问。");
       });
     }
 
@@ -547,14 +549,41 @@
         var from = places.find(function (p) { return p.id === routeIds[i]; });
         var to = places.find(function (p) { return p.id === routeIds[i + 1]; });
         if (!from || !to) continue;
-        var estimate = routeEstimates[from.id + "-" + to.id] || { distance: "约 -- km", duration: "约 --", note: "" };
+        var key = routeKey(from, to);
+        var estimate = routeEstimates[key] || { day: "", time: "", distance: "约 -- km", duration: "约 --", note: "" };
+        var actual = routeResults[key];
+        var distance = actual ? actual.distance : estimate.distance;
+        var duration = actual ? actual.duration : estimate.duration;
+        var source = actual ? "已刷新 " + actual.updatedAt : "行程估算";
         var div = document.createElement("div");
         div.className = "route-leg";
-        div.innerHTML = (i + 1) + ". " + escapeHtml(from.name) + " → " + escapeHtml(to.name) +
-          " · " + escapeHtml(estimate.distance) + " · " + escapeHtml(estimate.duration) +
+        div.innerHTML = "<strong>" + escapeHtml(estimate.day + " " + estimate.time) + "</strong><br>" +
+          (i + 1) + ". " + escapeHtml(from.name) + " → " + escapeHtml(to.name) +
+          " · " + escapeHtml(distance) + " · " + escapeHtml(duration) +
+          "<br><span class=\"note\">" + escapeHtml(source) + "</span>" +
           (estimate.note ? "<br><span class=\"note\">" + escapeHtml(estimate.note) + "</span>" : "") +
           '<br><a target="_blank" rel="noreferrer" href="' + navigationUrl(from, to) + '">在高德打开</a>';
         summary.appendChild(div);
+      }
+    }
+
+    function routeKey(from, to) {
+      return from.id + "-" + to.id;
+    }
+
+    function readRouteResults() {
+      try {
+        return JSON.parse(localStorage.getItem("dadaReaRouteResults") || "{}");
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveRouteResults() {
+      try {
+        localStorage.setItem("dadaReaRouteResults", JSON.stringify(routeResults));
+      } catch (error) {
+        return;
       }
     }
 
@@ -612,7 +641,14 @@
           var text = (index + 1) + ". " + leg[0].name + " → " + leg[1].name;
           if (status === "complete" && result.routes && result.routes.length) {
             var route = result.routes[0];
-            text += " · " + Math.round(route.distance / 1000) + " km · 约 " + Math.round(route.time / 60) + " 分钟";
+            var refreshed = {
+              distance: Math.round(route.distance / 1000) + " km",
+              duration: "约 " + Math.round(route.time / 60) + " 分钟",
+              updatedAt: new Date().toLocaleString("zh-CN", { hour12: false })
+            };
+            routeResults[routeKey(leg[0], leg[1])] = refreshed;
+            saveRouteResults();
+            text += " · " + refreshed.distance + " · " + refreshed.duration;
           } else {
             var estimate = routeEstimates[leg[0].id + "-" + leg[1].id] || { distance: "约 -- km", duration: "约 --" };
             text += " · " + estimate.distance + " · " + estimate.duration + " · 请跳转高德 App 复核";
@@ -621,9 +657,52 @@
           div.className = "route-leg";
           div.textContent = text;
           summary.appendChild(div);
+          if (index >= legs.length - 1) renderRouteLinks();
           calculateRouteLegs(AMap, legs, index + 1);
         });
       }, index === 0 ? 0 : 1200);
+    }
+
+    function copyRouteResults() {
+      var keys = Object.keys(routeResults);
+      if (!keys.length) {
+        setStatus("还没有刷新过实际车程。");
+        setDetail("先打开地图并点击“刷新实际车程”，再复制结果。");
+        return;
+      }
+      var payload = keys.map(function (key) {
+        var leg = findLegByKey(key);
+        var estimate = routeEstimates[key] || {};
+        var result = routeResults[key];
+        return [
+          estimate.day || "",
+          estimate.time || "",
+          leg ? leg[0].name : key,
+          leg ? leg[1].name : "",
+          result.distance,
+          result.duration,
+          result.updatedAt
+        ].join(" | ");
+      }).join("\n");
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(payload).then(function () {
+          setStatus("实际车程结果已复制。");
+          setDetail("把复制内容发给我，我可以固化进网页后重新发布。");
+        }).catch(function () {
+          setStatus("复制失败，请手动选择路线摘要里的刷新结果。");
+        });
+      } else {
+        setStatus("当前浏览器不支持一键复制，请手动复制路线摘要。");
+      }
+    }
+
+    function findLegByKey(key) {
+      for (var i = 0; i < routeIds.length - 1; i += 1) {
+        var from = places.find(function (p) { return p.id === routeIds[i]; });
+        var to = places.find(function (p) { return p.id === routeIds[i + 1]; });
+        if (from && to && routeKey(from, to) === key) return [from, to];
+      }
+      return null;
     }
 
     renderRouteLinks();
@@ -635,8 +714,8 @@
     window.addEventListener("error", function (event) {
       var message = event && event.message ? event.message : "未知脚本错误";
       if (String(message).indexOf("AMap") !== -1 || String(message).indexOf("amap") !== -1) {
-        setStatus("高德脚本运行报错：" + message);
-        setDetail("如果提示 INVALID_USER_KEY、USERKEY_PLAT_NOMATCH 或安全密钥相关错误，请回高德控制台检查 Key 类型、白名单和 securityJsCode。");
+        setStatus("互动地图暂时没有打开。");
+        setDetail("请检查地图授权和网页域名设置。");
       }
     });
     window.addEventListener("unhandledrejection", function (event) {

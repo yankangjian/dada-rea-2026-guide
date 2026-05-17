@@ -199,6 +199,7 @@
           <a class="button" href="https://uri.amap.com/navigation?from=118.895884,42.273811,%E8%B5%A4%E5%B3%B0%E7%AB%99&to=117.535164,43.930911,%E9%98%BF%E6%96%AF%E5%93%88%E5%9B%BE%E7%9F%B3%E6%9E%97&mode=car&policy=1&src=dada-rea-guide&coordinate=gaode&callnative=0" target="_blank" rel="noreferrer">打开高德导航示例</a>
         </div>
         <p id="load-status" class="note">未加载地图。填写 Key 和安全密钥后点击“加载地图”。</p>
+        <p id="load-detail" class="note"></p>
 
         <h2 style="margin-top:22px">图例</h2>
         <div class="legend">
@@ -249,9 +250,14 @@
     var routeIds = ["chifeng", "reshui", "huanggangliang", "ashatu", "baiyin", "gongger", "dali", "jingpeng-hotel", "chifeng"];
     var map;
     var resolved = {};
+    var loaderPromise;
 
     function setStatus(message) {
       document.getElementById("load-status").textContent = message;
+    }
+
+    function setDetail(message) {
+      document.getElementById("load-detail").textContent = message || "";
     }
 
     function amapSearchUrl(place) {
@@ -270,6 +276,7 @@
       var security = document.getElementById("amap-security").value.trim();
       if (!key || !security) {
         setStatus("请先填写 Key 和 securityJsCode。");
+        setDetail("");
         return;
       }
       localStorage.setItem("dadaReaAmapKey", key);
@@ -283,14 +290,56 @@
       document.getElementById("amap-key").value = "";
       document.getElementById("amap-security").value = "";
       setStatus("已清除本机保存的高德 Key。");
+      setDetail("如果刚刚加载失败，重新填写后再点“加载地图”。");
     }
 
     function loadAmap(key, security) {
-      if (window.AMap) {
-        initMap();
-        return;
-      }
+      setStatus("正在加载高德地图...");
+      setDetail("当前页面不会把 Key 写入源码，只保存在这个浏览器。");
       window._AMapSecurityConfig = { securityJsCode: security };
+      loadAmapLoader().then(function () {
+        return window.AMapLoader.load({
+          key: key,
+          version: "2.0",
+          plugins: ["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder", "AMap.Driving"]
+        });
+      }).then(function (AMapInstance) {
+        window.AMap = AMapInstance;
+        initMap(AMapInstance);
+      }).catch(function (error) {
+        setStatus("高德地图加载失败。");
+        setDetail(errorMessage(error) + "。请重点检查：Key 类型是否为 Web端(JS API)、securityJsCode 是否匹配、白名单是否包含 yankangjian.github.io。");
+      });
+    }
+
+    function loadAmapLoader() {
+      if (window.AMapLoader) return Promise.resolve();
+      if (loaderPromise) return loaderPromise;
+      loaderPromise = new Promise(function (resolve, reject) {
+        var script = document.createElement("script");
+        script.src = "https://webapi.amap.com/loader.js";
+        script.onload = function () { resolve(); };
+        script.onerror = function () { reject(new Error("AMapLoader 脚本加载失败")); };
+        document.head.appendChild(script);
+        window.setTimeout(function () {
+          if (!window.AMapLoader) reject(new Error("AMapLoader 超过 10 秒仍未就绪"));
+        }, 10000);
+      });
+      return loaderPromise;
+    }
+
+    function errorMessage(error) {
+      if (!error) return "未知错误";
+      if (typeof error === "string") return error;
+      if (error.message) return error.message;
+      try {
+        return JSON.stringify(error);
+      } catch (e) {
+        return String(error);
+      }
+    }
+
+    function loadAmapLegacy(key, security) {
       var script = document.createElement("script");
       script.src = "https://webapi.amap.com/maps?v=2.0&key=" + encodeURIComponent(key);
       script.onload = initMap;
@@ -310,32 +359,37 @@
       return '<div class="pin ' + place.category + '">' + place.label + '</div>';
     }
 
-    function initMap() {
+    function initMap(AMap) {
       if (map) map.destroy();
       resolved = {};
-      AMap.plugin(["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder", "AMap.Driving"], function () {
-        map = new AMap.Map("map", {
-          zoom: 7.6,
-          center: [117.75, 43.25],
-          viewMode: "2D",
-          mapStyle: "amap://styles/normal"
-        });
-        map.addControl(new AMap.Scale());
-        map.addControl(new AMap.ToolBar({ position: { right: "16px", top: "16px" } }));
-        setStatus("正在定位地点并计算路线...");
-        geocodePlaces().then(function () {
-          addMarkers();
-          drawScenicPolyline();
-          drawDrivingRoute();
-          setStatus("高德地图已加载。路线为分段驾车规划，实际导航仍以出发当天为准。");
-        }).catch(function () {
-          setStatus("地点解析失败。请先确认 Key 和安全密钥是否正确。");
-        });
+      map = new AMap.Map("map", {
+        zoom: 7.6,
+        center: [117.75, 43.25],
+        viewMode: "2D",
+        mapStyle: "amap://styles/normal"
+      });
+      map.addControl(new AMap.Scale());
+      map.addControl(new AMap.ToolBar({ position: { right: "16px", top: "16px" } }));
+      setStatus("正在定位地点并计算路线...");
+      setDetail("");
+      geocodePlaces(AMap).then(function () {
+        addMarkers(AMap);
+        drawScenicPolyline(AMap);
+        drawDrivingRoute(AMap);
+        setStatus("高德地图已加载。路线为分段驾车规划，实际导航仍以出发当天为准。");
+        setDetail("如果某段路线计算失败，通常是景区线性路段或草原道路在路线服务里匹配不稳定，页面会保留近似景观线。");
+      }).catch(function (error) {
+        setStatus("地点解析失败。");
+        setDetail(errorMessage(error));
       });
     }
 
-    function geocodePlaces() {
-      return new Promise(function (resolve) {
+    function geocodePlaces(AMap) {
+      return new Promise(function (resolve, reject) {
+        if (!AMap.Geocoder) {
+          reject(new Error("AMap.Geocoder 插件未加载"));
+          return;
+        }
         var geocoder = new AMap.Geocoder({ city: "赤峰" });
         var pending = places.map(function (place) {
           return new Promise(function (done) {
@@ -353,7 +407,7 @@
       });
     }
 
-    function addMarkers() {
+    function addMarkers(AMap) {
       var points = [];
       places.forEach(function (place) {
         var point = resolved[place.id];
@@ -376,7 +430,7 @@
       if (points.length) map.setFitView(null, false, [60, 40, 60, 40]);
     }
 
-    function drawScenicPolyline() {
+    function drawScenicPolyline(AMap) {
       var scenicIds = ["reshui", "huanggangliang", "ashatu", "baiyin", "gongger", "dali"];
       var path = scenicIds.map(function (id) { return resolved[id]; }).filter(Boolean);
       if (path.length < 2) return;
@@ -390,9 +444,13 @@
       }).setMap(map);
     }
 
-    function drawDrivingRoute() {
+    function drawDrivingRoute(AMap) {
       var summary = document.getElementById("route-summary");
       summary.innerHTML = "";
+      if (!AMap.Driving) {
+        summary.innerHTML = '<div class="route-leg">路线插件未加载成功，请检查 Key 权限或稍后重试。</div>';
+        return;
+      }
       var legs = [];
       for (var i = 0; i < routeIds.length - 1; i += 1) {
         var from = places.find(function (p) { return p.id === routeIds[i]; });
@@ -431,6 +489,7 @@
       var message = event && event.message ? event.message : "未知脚本错误";
       if (String(message).indexOf("AMap") !== -1 || String(message).indexOf("amap") !== -1) {
         setStatus("高德脚本运行报错：" + message);
+        setDetail("如果提示 INVALID_USER_KEY、USERKEY_PLAT_NOMATCH 或安全密钥相关错误，请回高德控制台检查 Key 类型、白名单和 securityJsCode。");
       }
     });
     window.addEventListener("unhandledrejection", function (event) {
